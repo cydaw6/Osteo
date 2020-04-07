@@ -16,6 +16,7 @@ session_start(); // On démarre la session AVANT toute chose
            <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>  
            <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>            
            <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css">
+           <script src="//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"></script>
 
 
             <style type="text/css">
@@ -111,15 +112,15 @@ session_start(); // On démarre la session AVANT toute chose
 
 </body>
 </html>
-<script>  
- $(document).ready(function(){  
-      $('#employee_data').DataTable();  
- });  
- </script> 
-
-
-
-
+<script>
+     $(document).ready(function() {
+     $('#employee_data').DataTable( {
+          "language": {
+               "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+          }
+     } );
+     } );
+</script>
 
 
 

@@ -2,7 +2,7 @@
 						// connexion à la base abastos de sqletud
 
 							define('HOST','localhost');
-							define('DB_NAME', 'osteo_db');
+							define('DB_NAME', 'osteo_db2');
 							define('USER', 'root');
 							define('PASS', '');
 
