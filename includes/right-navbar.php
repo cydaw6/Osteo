@@ -181,8 +181,9 @@ background:#262626;
                
 
               </li>
-              <li><div class="icons"><button type="submit" name="proprietaires"><i class="fa fa-group"></i></div></button><div class="linktitle">
-                <input class="subm" type="submit" name="proprietaires" value="Propriétaires">
+              <li><div class="icons"><a href="./proprietaires.php"><i class="fa fa-group"></i></div></a><a href="./proprietaires.php"><div class="linktitle">Propriétaires</div></a>
+                <!-- <input class="subm" type="submit" name="proprietaires" value="Propriétaires">
+                -->
 
 
               </li>
