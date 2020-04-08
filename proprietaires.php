@@ -51,7 +51,7 @@ session_start(); // On démarre la session AVANT toute chose
                     include './includes/right-navbar.php';
                     include './includes/database.php'; // Connexion à la bdd
                     $a = $_SESSION['id'];
-                    $tableParticulier=$db->query("SELECT nomPa,prenomPa,telPa,emailPa,adresse,localite,codePostal FROM particulier NATURAL JOIN possede_proprio WHERE USER_id=$a");
+                    $tableParticulier=$db->query("SELECT nomPa,prenomPa,telPa,emailPa,adresse,localite,codePostal FROM particulier NATURAL JOIN possede_proprio WHERE osteo_id=$a");
 
 
                     function containsNumber($str){
@@ -73,7 +73,7 @@ session_start(); // On démarre la session AVANT toute chose
                     }
 
                     function particulierAlreadyExists($result){ 
-                         while($t = $result->fetch){
+                         while($t = $result->fetch()){
                               if($t['adresse']==$_POST['adresse'] && $t['localite']==$_POST['localite']){
                                    return true;
                               }
@@ -82,27 +82,61 @@ session_start(); // On démarre la session AVANT toute chose
                     }
 
                     function addParticulier($db){
+                         
                          $db -> beginTransaction(); // Opération sécurisée car plusieurs personnes peuvent ajouter des propriétaires !
                          $db -> query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
-                         $result = $db -> query("SELECT * FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
-                         
-                         $addPa = $db->prepare("INSERT INTO particulier VALUES(:id, :nomPa, :prenomPa, :telPA, :emailPa; :adrese, :localite, :codePostal)");
-                         $addPa ->execute(['id' => $result, 'nomPa' => $_POST['nomPa'], 
-                                        'prenomPa' =>  $_POST['prenomPa'], 'telPa' =>  $_POST['telPa'],
-                                        'emailPa'=> $_POST['emailPa'], 'adresse'=> $_POST['adresse'],
-                                        'localite'=>  $_POST['localite'], 
-                                        'codePostal'=>  $_POST['codePostal']
-                                        ]);
-                         
-                         $possedeProprio = $db ->prepare("INSERT INTO possede_proprio VALUES(:userID, idProp) ");
-                         $possedeProprio -> execute(['userID' => $_SESSION['id'], 'idProp' => $result]);
-                         
-
-
-
-
+                         $result = $db -> query("SELECT idProprietaire FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
+                         $id = $result->fetch();
+                         echo $id['idProprietaire'] . '  '. $_POST['prenomPa'];
                          /* On valide les modifications */
                          $db->commit();
+
+                         $a = (int) $id['idProprietaire'];
+                         $b =  $_POST['nomPa'];
+                         $c = (string)$_POST['prenomPa'];
+                         $d = (int) $_POST['telPa'];
+                         $e =  $_POST['emailPa'];
+                         $f = $_POST['adresse'];
+                         $g = $_POST['localite'];
+                         $h = (int) $_POST['codePostal'];
+                        
+                         $x = $db->prepare("INSERT INTO `particulier` (idProprietaire, nomPa, prenomPa, telPa, emailPa, adresse, localite, codePostal) VALUES (:a, :b, :c, :d, :e, :f, :g, :h)");
+                         $x -> execute(array(':a'=>$a, 'b'=>$b, 'c'=>$c, 'd'=>$d, 'e'=>$e, 'f'=>$f, 'g'=>$g, 'h'=>$h));
+
+                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
+                         $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
+
+                         ?>
+                         <meta http-equiv="refresh" content="0">
+                         <?php
+                         /*
+                         (:a,:b,:c,:d,:e,:f,:g,:h)
+                         execute(array(':a'=>$a,':b'=>$b,':c'=>$c,':d'=>$d,':e'=>$e,':f'=>$f,':g'=>$g,':h'=>$h));
+                         49,'5','8',5,'1','8','6',7
+                         $a,$b,$c,$d,$e,$f,$g,$h
+                         VALUES (:idPa, :nomPa, :prenomPa, :telPa, :emailPa; :adresse, :localite, :codePostal)");
+                         $addPa->execute(['idPa' => $id['idProprietaire'], 
+                                        'nomPa' => $_POST['nomPa'], 
+                                        'prenomPa' =>  $_POST['prenomPa'], 
+                                        'telPa' =>  $_POST['telPa'],
+                                        'emailPa' => $_POST['emailPa'], 
+                                        'adresse' => $_POST['adresse'],
+                                        'localite' =>  $_POST['localite'], 
+                                        'codePostal' =>  $_POST['codePostal']
+                                        ]);
+
+                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
+                         $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
+
+                         */
+                         
+                        
+                         
+
+
+
+
+                         
                     }
 
 
@@ -194,7 +228,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                        $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa]);
                                                        $result = $homonyme->rowCount();
                                                        if($result>=1) {
-                                                            if(particulierAlreadyExists($result)){
+                                                            if(particulierAlreadyExists($homonyme)){
                                                                  echo 'Cette personne est déjà enregistrée';
                                                             }else{
                                                                  addParticulier($db);
