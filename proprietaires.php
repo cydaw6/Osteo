@@ -35,8 +35,6 @@ session_start(); // On démarre la session AVANT toute chose
                    max-width: 100%;
               }
 
-              
-
             </style>
 
             
@@ -47,21 +45,16 @@ session_start(); // On démarre la session AVANT toute chose
                 
                    <?php
                     include './includes/header.php';
-
                     include './includes/right-navbar.php';
                     include './includes/database.php'; // Connexion à la bdd
                     $a = $_SESSION['id'];
                     $tableParticulier=$db->query("SELECT nomPa,prenomPa,telPa,emailPa,adresse,localite,codePostal FROM particulier NATURAL JOIN possede_proprio WHERE osteo_id=$a");
 
-
                     function containsNumber($str){
                          if (preg_match('#[0-9]#',$str)){
-
                               return true;
                          }
                          return false;
-                         
-
                     }
 
                     function containsSpecialChars($str){
@@ -75,10 +68,10 @@ session_start(); // On démarre la session AVANT toute chose
                     function particulierAlreadyExists($result){ 
                          while($t = $result->fetch()){
                               if($t['adresse']==$_POST['adresse'] && $t['localite']==$_POST['localite']){
-                                   return true;
+                                   return $t['idProprietaire'];
                               }
                          }
-                         return false;
+                         return null;
                     }
 
                     function addParticulier($db){
@@ -91,54 +84,43 @@ session_start(); // On démarre la session AVANT toute chose
                          /* On valide les modifications */
                          $db->commit();
 
-                         $a = (int) $id['idProprietaire'];
-                         $b =  $_POST['nomPa'];
-                         $c = (string)$_POST['prenomPa'];
-                         $d = (int) $_POST['telPa'];
-                         $e =  $_POST['emailPa'];
-                         $f = $_POST['adresse'];
-                         $g = $_POST['localite'];
-                         $h = (int) $_POST['codePostal'];
+                         
+                        
                         
                          $x = $db->prepare("INSERT INTO `particulier` (idProprietaire, nomPa, prenomPa, telPa, emailPa, adresse, localite, codePostal) VALUES (:a, :b, :c, :d, :e, :f, :g, :h)");
-                         $x -> execute(array(':a'=>$a, 'b'=>$b, 'c'=>$c, 'd'=>$d, 'e'=>$e, 'f'=>$f, 'g'=>$g, 'h'=>$h));
+                         $x -> execute(array(
+                              ':a'=> $id['idProprietaire'],
+                              'b'=> $_POST['nomPa'], 
+                              'c'=> $_POST['prenomPa'], 
+                              'd'=> $_POST['telPa'], 
+                              'e'=> $_POST['emailPa'], 
+                              'f'=> $_POST['adresse'], 
+                              'g'=> $_POST['localite'], 
+                              'h'=> $_POST['codePostal']
+                         ));
 
                          $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
                          $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
 
+                         /* On rafraichi la page */
                          ?>
-                         <meta http-equiv="refresh" content="0">
+                         <meta http-equiv="refresh" content="0"> 
                          <?php
-                         /*
-                         (:a,:b,:c,:d,:e,:f,:g,:h)
-                         execute(array(':a'=>$a,':b'=>$b,':c'=>$c,':d'=>$d,':e'=>$e,':f'=>$f,':g'=>$g,':h'=>$h));
-                         49,'5','8',5,'1','8','6',7
-                         $a,$b,$c,$d,$e,$f,$g,$h
-                         VALUES (:idPa, :nomPa, :prenomPa, :telPa, :emailPa; :adresse, :localite, :codePostal)");
-                         $addPa->execute(['idPa' => $id['idProprietaire'], 
-                                        'nomPa' => $_POST['nomPa'], 
-                                        'prenomPa' =>  $_POST['prenomPa'], 
-                                        'telPa' =>  $_POST['telPa'],
-                                        'emailPa' => $_POST['emailPa'], 
-                                        'adresse' => $_POST['adresse'],
-                                        'localite' =>  $_POST['localite'], 
-                                        'codePostal' =>  $_POST['codePostal']
-                                        ]);
-
-                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
-                         $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
-
-                         */
-                         
-                        
-                         
-
-
-
-
-                         
                     }
 
+                    function addPersonalParticulier($db, $id){
+
+                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
+                         $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id]);
+
+                         /* On rafraichi la page */
+                         ?>
+                         <meta http-equiv="refresh" content="0"> 
+                         <?php
+
+                    }
+                         
+                    
 
                     ?>
                 
@@ -227,9 +209,18 @@ session_start(); // On démarre la session AVANT toute chose
                                                        $homonyme = $db->prepare("SELECT nomPa, prenomPa, adresse, localite FROM particulier WHERE nomPa= :nomPa AND prenomPa= :prenomPa");
                                                        $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa]);
                                                        $result = $homonyme->rowCount();
-                                                       if($result>=1) {
-                                                            if(particulierAlreadyExists($homonyme)){
-                                                                 echo 'Cette personne est déjà enregistrée';
+                                                       if($result>=1) { # verification dans la base générale
+                                                            $samePersonID = particulierAlreadyExists($homonyme);
+                                                            if($samePersonID!=null){
+                                                                 # echo 'Cette personne est déjà enregistrée';
+
+                                                                 $homonyme = $db->prepare("SELECT nomPa, prenomPa, adresse, localite, osteo_id FROM particulier NATURAL JOIN `possede_proprio` WHERE nomPa= :nomPa AND prenomPa= :prenomPa AND osteo_id=:osteoId");
+                                                                 $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'osteoId' => $_SESSION['id']]);
+                                                                 $result = $homonyme->rowCount();
+                                                                 if(particulierAlreadyExists($homonyme)){ # verification dans la base unique de l'osteo
+                                                                      addPersonalParticulier($db,$samePersonID);
+                                                                 }
+
                                                             }else{
                                                                  addParticulier($db);
                                                             }
@@ -296,6 +287,7 @@ session_start(); // On démarre la session AVANT toute chose
                                              ?>  
                               </table>  
                          </div>
+
                          <h3 align="center"> Organismes </h3>  
                          <br />  
                          <div class="table-responsive" style="position=relative;">  

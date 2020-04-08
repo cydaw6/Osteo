@@ -57,7 +57,7 @@ session_start(); // On démarre la session AVANT toute chose
                                      $_SESSION['username'] = $result['username'];
                                      $_SESSION['date'] = $result['date'];
                                      $_SESSION['email'] = $result['email'];
-                                     $_SESSION['id'] = $result['USER_id'];               
+                                     $_SESSION['id'] = $result['osteo_id'];               
 
                                      echo '<meta http-equiv="refresh" content="1;URL=./index.php">';
 
