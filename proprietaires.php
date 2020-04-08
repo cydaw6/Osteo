@@ -16,8 +16,6 @@ session_start(); // On démarre la session AVANT toute chose
            <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>  
            <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>            
            <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css">
-           <script src="//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"></script>
-
 
             <style type="text/css">
 
@@ -36,7 +34,12 @@ session_start(); // On démarre la session AVANT toute chose
               form input[type=text]{
                    max-width: 100%;
               }
+
+              
+
             </style>
+
+            
 </head>
 <body>          
 
@@ -46,8 +49,63 @@ session_start(); // On démarre la session AVANT toute chose
                     include './includes/header.php';
 
                     include './includes/right-navbar.php';
-                    include './includes/database.php';
-                    $result=$db->query("SELECT * FROM ANIMAL");
+                    include './includes/database.php'; // Connexion à la bdd
+                    $a = $_SESSION['id'];
+                    $tableParticulier=$db->query("SELECT nomPa,prenomPa,telPa,emailPa,adresse,localite,codePostal FROM particulier NATURAL JOIN possede_proprio WHERE USER_id=$a");
+
+
+                    function containsNumber($str){
+                         if (preg_match('#[0-9]#',$str)){
+
+                              return true;
+                         }
+                         return false;
+                         
+
+                    }
+
+                    function containsSpecialChars($str){
+                         if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬]/', $str))
+                         {
+                                   return true;
+                         }
+                         return false;
+                    }
+
+                    function particulierAlreadyExists($result){ 
+                         while($t = $result->fetch){
+                              if($t['adresse']==$_POST['adresse'] && $t['localite']==$_POST['localite']){
+                                   return true;
+                              }
+                         }
+                         return false;
+                    }
+
+                    function addParticulier($db){
+                         $db -> beginTransaction(); // Opération sécurisée car plusieurs personnes peuvent ajouter des propriétaires !
+                         $db -> query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
+                         $result = $db -> query("SELECT * FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
+                         
+                         $addPa = $db->prepare("INSERT INTO particulier VALUES(:id, :nomPa, :prenomPa, :telPA, :emailPa; :adrese, :localite, :codePostal)");
+                         $addPa ->execute(['id' => $result, 'nomPa' => $_POST['nomPa'], 
+                                        'prenomPa' =>  $_POST['prenomPa'], 'telPa' =>  $_POST['telPa'],
+                                        'emailPa'=> $_POST['emailPa'], 'adresse'=> $_POST['adresse'],
+                                        'localite'=>  $_POST['localite'], 
+                                        'codePostal'=>  $_POST['codePostal']
+                                        ]);
+                         
+                         $possedeProprio = $db ->prepare("INSERT INTO possede_proprio VALUES(:userID, idProp) ");
+                         $possedeProprio -> execute(['userID' => $_SESSION['id'], 'idProp' => $result]);
+                         
+
+
+
+
+                         /* On valide les modifications */
+                         $db->commit();
+                    }
+
+
                     ?>
                 
             </div>
@@ -56,66 +114,166 @@ session_start(); // On démarre la session AVANT toute chose
           
             
                                 
-
+           
                 <div style="padding-left: 170px; margin-right: 0px; margin-left: 0px; background-color:white; max-width: 100%;">
                     
                     <div class="container" style="background-color: white; max-width: 830px; min-width: 100px!important;">
+                         <br>
+                         <center>
+                         <div>
+                         <br>
+                              <div style="position=relative; padding= 3px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;"> 
+                                        <br>
+                                        Ajouter un organisme 
+                                        <br>
+                                        <br>
+                                        <form method="post" action="./proprietaires.php">
+                                             <input type="text" name="raison" placeholder="Raison sociale" required>
+                                             <input type="text" name="typeOrga" placeholder="Type d'organisation" required>
+                                             <input type="submit" name="subOrga" value="Ajouter">
+                                             <input type="reset" value="Effacer">
+                                             <br>
+                                             <br>
+                                        </form>
+                              </div>
+                              <br>
+                              <div style="position= relative; padding = 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                                        <br>
+                                        Ajouter un particulier
+                                        <br>
+                                        <br>
+                                        <form method="post" action="./proprietaires.php">
+                                             <input type="text" name="nomPa" placeholder="Nom" required>
+                                             <input type="text" name="prenomPa" placeholder="Prénom" required>
+                                             <input type="text" name="telPa" placeholder="Téléphone" required>
+                                             <input type="text" name="emailPa" placeholder="Email" required>
+                                             <input type="text" name="adresse" placeholder="Adresse" required>
+                                             <input type="text" name="localite" placeholder="Localite" required>
+                                             <input type="text" name="codePostal" placeholder="Code Postal" required>
+                                             <br>
+                                             
+                                             <input type="submit" name="subProp" value="Ajouter">
+                                             <input type="reset" value="Effacer" onAction=>
+                                             <br>
+                                             <br>
+                                        </form>
 
-                         <div style="position= relative; max-width: 100%;margin-right: 1%; margin-left: 1%; height: 100px; background: cyan ;"> 
-                              <b> Ajouter un propriétaire </b>
+                                        <?php
+
+                                            
+                                             if(isset($_POST['subProp'])){
+                                                  extract($_POST);
+
+                                                  if(containsSpecialChars($nomPa) || containsSpecialChars($prenomPa) || 
+                                                       containsSpecialChars($telPa) || containsSpecialChars($adresse) || 
+                                                       containsSpecialChars($nomPa) || containsSpecialChars($codePostal) ){
+                                                            echo 'Les caractères spéciaux ne sont pas autorisés';
+                                                  
+                                                  }elseif (containsNumber($nomPa) || containsNumber($prenomPa) ){
+                                                       echo 'Le nom ou le prénom ne peuvent contenir des nombres';
+                                                  }elseif (!ctype_digit($telPa)){
+                                                       echo 'Le numéron de téléphone ne doit contenir que des chiffres';
+                                                  }elseif (!ctype_digit($codePostal)){
+                                                       echo 'Le code postal ne doit contenir que des chiffres';
+                                                  }elseif(!filter_var($emailPa, FILTER_VALIDATE_EMAIL)){
+                                                       echo 'Adresse email non valide';
+
+                                                       $quer=$db->query("SELECT email FROM particulier WHERE email= :email");
+                                                       $quer->execute(['email'=>$emailPa]);
+                                                       $numb = $quer->rowCount();
+                                                       if($numb >= 1){
+                                                            echo 'Cette adresse email est déjà utilisée';
+                                                       }
+                                                       
+
+                                                  }else{
+                                                       
+                                                       
+                                                       
+                                                       $homonyme = $db->prepare("SELECT nomPa, prenomPa, adresse, localite FROM particulier WHERE nomPa= :nomPa AND prenomPa= :prenomPa");
+                                                       $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa]);
+                                                       $result = $homonyme->rowCount();
+                                                       if($result>=1) {
+                                                            if(particulierAlreadyExists($result)){
+                                                                 echo 'Cette personne est déjà enregistrée';
+                                                            }else{
+                                                                 addParticulier($db);
+                                                            }
+                                                       }else{
+                                                            addParticulier($db);
+                                                       }
+
+
+
+
+
+                                                      
+
+                                                  }
+
+
+                                                  
+                                                  
+                                             }else if(isset($_POST['subOrga'])){
+
+                                             }
+
+                                        ?>
+
+                              </div>
                               <br>
-                              <br>
-                              <form method="post" action="./index.php">
-                                   <input type="text" name="new-password" placeholder="Nom" required>
-                                   <input type="text" name="new-password" placeholder="Prénom" required>
-                                   <input type="text" name="new-password" placeholder="Téléphone" required>
-                                   <input type="text" name="new-password" placeholder="Email" required>
-                                   <input type="text" name="new-password" placeholder="Adresse" required>
-                                   <input type="text" name="new-password" placeholder="Localite" required>
-                                   <input type="text" name="new-password" placeholder="Code Postal" required>
-                                   
-                                   <input type="submit" name="sub-password" value="ajouter">
-                                   <input type="reset" value="effacer">
-                              </form>
                          </div>
-                         
+                         <center>
 
-                         <div style="position= relative; max-width: 100%;margin-right: 1%; margin-left: 1%; height: 100px; background: violet ;"> 
-                              <b> Ajouter un organisme </b>
-                              <br>
-                              <br>
-                              <form method="post" action="./index.php">
-                                   <input type="text" name="new-password" placeholder="Raison sociale" required>
-                                   
-                                   <input type="submit" name="sub-password" value="ajouter">
-                                   <input type="reset" value="effacer">
-                              </form>
-                         </div>
+                        
 
 
 
 
 
-
-                         <h3 align="center"> Propriétaires </h3>  
+                         <h3 align="center"> Particuliers </h3>  
                          <br />  
-                         <div class="table-responsive">  
+                         <div class="table-responsive" style="position=relative;">  
                               <table id="employee_data" class="table table-striped table-bordered">  
                                         <thead>  
                                              <tr>  
-                                                  <th>id</th>
                                                   <th>Nom</th>
-                                                  <th>Espèce</th>
-                                                  <th>Race</th>
-                                                  <th>Taille</th>
-                                                  <th>Poids</th>
-                                                  <th>Genre</th>
-                                                  <th>Castration</th>
-                                                  <th>id Propriétaire</th>  
+                                                  <th>Prénom</th>
+                                                  <th>Tel</th>
+                                                  <th>email</th>
+                                                  <th>Adresse</th>
+                                                  <th>Localite</th>
+                                                  <th>codePostal</th>
                                              </tr>  
                                         </thead>  
                                              <?php  
-                                                  while($t = $result->fetch())  
+                                                  while($t = $tableParticulier->fetch())  
+                                                  {  
+                                                       echo "<tr><td>".$t['nomPa'].
+                                                            "</td><td>".$t['prenomPa'].
+                                                            "</td><td>".$t['telPa'].
+                                                            "</td><td>".$t['emailPa'].
+                                                            "</td><td>".$t['adresse'].
+                                                            "</td><td>".$t['localite'].
+                                                            "</td><td>".$t['codePostal'].
+                                                            "</td></tr>";
+                                                       
+                                                  }  
+                                             ?>  
+                              </table>  
+                         </div>
+                         <h3 align="center"> Organismes </h3>  
+                         <br />  
+                         <div class="table-responsive" style="position=relative;">  
+                              <table id="employee_data" class="table table-striped table-bordered">  
+                                        <thead>  
+                                             <tr>  
+                                                  <th>Raison sociale</th>
+                                                  <th>Type</th>
+                                             </tr>  
+                                        </thead>  
+                                             <?php  
+                                                  while($t = $tableParticulier->fetch())  
                                                   {  
                                                        echo "<tr><td>".$t['idAnimal'].
                                                             "</td><td>".$t['nomAnimal'].
@@ -131,7 +289,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                   }  
                                              ?>  
                               </table>  
-                         </div>  
+                         </div> 
                     </div>
 
                     <div id="bottom-bar"> <!-- logo univ-->
@@ -140,17 +298,6 @@ session_start(); // On démarre la session AVANT toute chose
                   
                 </div>                               
                 
-
-              
-              
-            
-               
-            
- 
-
-        
-        
-
 
 </body>
 </html>

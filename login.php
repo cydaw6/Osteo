@@ -56,7 +56,8 @@ session_start(); // On démarre la session AVANT toute chose
                                       echo "Connexion réussie. Redirection...";
                                      $_SESSION['username'] = $result['username'];
                                      $_SESSION['date'] = $result['date'];
-                                     $_SESSION['email'] = $result['email'];                           
+                                     $_SESSION['email'] = $result['email'];
+                                     $_SESSION['id'] = $result['USER_id'];               
 
                                      echo '<meta http-equiv="refresh" content="1;URL=./index.php">';
 
