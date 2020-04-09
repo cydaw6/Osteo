@@ -92,6 +92,7 @@ session_start(); // On démarre la session AVANT toute chose
                                      </table>  
                                 </div>  
                            </div>
+                           
                            <div id="bottom-bar"> <!-- logo univ-->
                         <p></p>
                   </div> 
