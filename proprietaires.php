@@ -229,10 +229,10 @@ session_start(); // On démarre la session AVANT toute chose
                                                   <th>Nom</th>
                                                   <th>Prénom</th>
                                                   <th>Tel</th>
-                                                  <th>email</th>
+                                                  <th>Email</th>
                                                   <th>Adresse</th>
                                                   <th>Localite</th>
-                                                  <th>codePostal</th>
+                                                  <th>Code Postal</th>
                                                   <th>Action</th>
                                              </tr>  
                                         </thead>  
@@ -254,21 +254,23 @@ session_start(); // On démarre la session AVANT toute chose
                                                             "</td><td>".$t['adresse'].
                                                             "</td><td>".$t['localite'].
                                                             "</td><td>".$t['codePostal'].
-                                                            "</td><td>".' | '. '<form method="post" action="./proprietaires.php">
-                                                                                <input type="hidden" name="idProp" value="'. $t['idProprietaire'] .'" ><input type="submit" name="delProp" value="supprimer">'.
+                                                            "</td><td>".' '. '<form method="post" action="./proprietaires.php">
+                                                                                <input type="hidden" name="idProp" value="'. $t['idProprietaire'] .'" >
+                                                                                <input type="submit" name="majProp" value="modifier">
+                                                                                <input type="submit" name="delProp" value="supprimer">
+                                                                                '.
                                                             "</td></tr>";
                                                        
                                                   }  
                                                  
-                                                  if(isset($_POST['delProp'])){
-
+                                                  /* On gère la suppression du propriétaire */
+                                                  if(isset($_POST['delProp'])){ 
                                                        $s=$_SESSION['id'];
                                                        $o=$_POST['idProp'];
                                                        $db->query("DELETE FROM `possede_proprio` WHERE  osteo_id=$s AND idProprietaire=$o ");
                                                        ?>
                                                        <meta http-equiv="refresh" content="0"> 
                                                        <?php
-
                                                        unset($_POST['delProp']);
                                                   }
 
