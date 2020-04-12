@@ -78,8 +78,25 @@ session_start(); // On démarre la session AVANT toute chose
                               'g'=> $_POST['localite'], 
                               'h'=> $_POST['codePostal']
                          ));
-                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
+                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:idProp, :userID) ");
                          $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
+                         
+                         /* SI contact d'un organisme on l'ajoute à `a_contacter` */
+                         
+                         if($_POST['organisme']!="null"){
+                              $idProprio= $id['idProprietaire'];
+                              $idOrga= $_POST['organisme'];
+                              $fonction= "";
+
+                              if($_POST['fonction']!=""){
+                                   $fonction=$_POST['fonction'];
+                              }
+                              // echo $id['idProprietaire'].' '.$_POST['organisme']. ' '.$_POST['fonction'];
+                              $ajout = $db->prepare("INSERT INTO a_contacter VALUES(:idProprio, :idOrga, :fonction)");
+                              $ajout->execute(['idProprio' => $id['idProprietaire'], 'idOrga' => $_POST['organisme'] ,'fonction' => $fonction]);
+
+                         }
+                         
                          /* On rafraichi la page */
                          ?>
                          <meta http-equiv="refresh" content="0"> 
@@ -111,8 +128,9 @@ session_start(); // On démarre la session AVANT toute chose
                               <form method="post" action="./proprietaires.php" >
                               <select name="printChoice" onchange="this.form.submit()" >
                                    <option value="Affichage">Affichage</option>
-                                   <option value="Proprio">Propriétaires</option>
+                                   <option value="Proprio">Particuliers</option>
                                    <option value="Orga">Organisations</option>
+                                   <option hidden> ---  --  --- -----ooooooooooooooooooooooooooooooooo o o o o o o o o oo o o-- ---- --- ----- -- -- - </option>
                                    </select>
                                    <input type="submit"  name="print" hidden>
                               </form>
@@ -122,12 +140,20 @@ session_start(); // On démarre la session AVANT toute chose
                          <?php
                               if(isset($_POST['printChoice'])){
                                    if($_POST['printChoice']=="Orga"){
+                                        $_SESSION['showContentProprio']="Orga";
+                                   }elseif($_POST['printChoice']=="Proprio"){
+                                        $_SESSION['showContentProprio']="Particulier";
+                                   }
+                                   ?>
+                                   <meta http-equiv="refresh" content="0"> 
+                                   <?php
+                              }
+                                       
+                              if($_SESSION['showContentProprio']=="Orga"){
                                         $a= $_SESSION['id'];
                                         $tableOrga=$db->query("SELECT idProprietaire, raisonSociale, typeOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
                                         $typeOrga=$db->query("SELECT * FROM type_orga");
                                         ?>
-                                             
-
                                              <div style="position=relative; padding= 3px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;"> 
                                                   <br>
                                                   Ajouter un organisme 
@@ -169,8 +195,6 @@ session_start(); // On démarre la session AVANT toute chose
                                                             echo 'Cette organisme est déjà enregistré';
                                                        }else{
                                                             // il n'existe pas dans ses propres enregistrement, on verif maintenant dans la base générale WHERE raisonSociale=$a LIMIT $b
-                                                            
-                                                            
                                                             $alreadyExist=$db->prepare("SELECT idProprietaire FROM organisme WHERE raisonSociale=:a");
                                                             $alreadyExist->execute(['a'=>$_POST['raison']]);
                                                             if($alreadyExist->rowCount() == 1){
@@ -213,26 +237,34 @@ session_start(); // On démarre la session AVANT toute chose
                                                                       echo "<tr><td>".$t['raisonSociale'].
                                                                                 "</td><td>".$t['typeOrga'].
                                                                                 "</td><td>".' '. '<form method="post" action="./proprietaires.php">
-                                                                                               <input type="hidden" name="idProp" value="'. $t['idProprietaire'] .'" >
-                                                                                               <input type="submit" name="majProp" value="modifier">
-                                                                                               <input type="submit" name="delProp" value="supprimer">
-                                                                                               <input type="submit" name="delProp" value="Voir les contacts">
+                                                                                               <input type="hidden" name="idOrga" value="'. $t['idProprietaire'] .'" >
+                                                                                               <input type="submit" name="seeOrga" value="Voir les contacts">
+                                                                                               <input hidden name="printChoice" value="Orga">
+                                                                                               <input hidden name="print">
+                                                                                               <input type="submit" name="delOrga" value="supprimer">
                                                                                                '.
                                                                                 "</td></tr>";  
                                                                  }  
+                                                                 /* On gère la suppression de l'organisme */
+                                                                 if(isset($_POST['delOrga'])){ 
+                                                                      $s=$_SESSION['id'];
+                                                                      $o=$_POST['idOrga'];
+                                                                      $db->query("DELETE FROM `possede_proprio` WHERE  osteo_id=$s AND idProprietaire=$o ");
+                                                                      ?>
+                                                                      <meta http-equiv="refresh" content="0"> 
+                                                                      <?php
+                                                                      unset($_POST['delOrga']);
+                                                                 }
                                                             ?>  
                                                   </table>  
                                              </div> 
                                         <?php
-                                        
-                                   }
-                              }
+                                   }   
+                              
 
-                              if(!isset($_POST['printChoice']) || $_POST['printChoice'] == "Proprio"){
-
-                            
+                                   if($_SESSION['showContentProprio']=="Particulier"){
+                                        $allOrga = $db-> query("SELECT * FROM organisme ORDER BY raisonSociale");
                                         ?>
-
                                              <br>
                                              <div style="position= relative; padding = 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
                                                        <br>
@@ -248,6 +280,19 @@ session_start(); // On démarre la session AVANT toute chose
                                                             <input type="text" name="localite" placeholder="Localite" required>
                                                             <input type="text" name="codePostal" placeholder="Code Postal" required>
                                                             <br>
+                                                            <br>
+                                                            Si contact d'une organisation
+                                                            <select name="organisme">
+                                                                 <option value="null"> Organisme</option>
+                                                                 <?php
+                                                                      while($t=$allOrga->fetch()){
+                                                                           echo '<option value="'.$t['idProprietaire'].'">'. $t['raisonSociale'] . '-' . $t['typeOrga'] .'"</option>';
+                                                                      }
+                                                                 ?>
+                                                            </select>
+                                                            <input type="text" name="fonction" placeholder="Fonction">
+
+                                                            <br>
                                                             
                                                             <input type="submit" name="subProp" value="Ajouter">
                                                             <input type="reset" value="Effacer" onAction=>
@@ -262,7 +307,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                                  extract($_POST);
                                                                  if(containsSpecialChars($nomPa) || containsSpecialChars($prenomPa) || 
                                                                       containsSpecialChars($telPa) || containsSpecialChars($adresse) || 
-                                                                      containsSpecialChars($nomPa) || containsSpecialChars($codePostal) ){
+                                                                      containsSpecialChars($nomPa) || containsSpecialChars($codePostal) || containsSpecialChars($fonction) ){
                                                                            echo 'Les caractères spéciaux ne sont pas autorisés';
                                                                  
                                                                  }elseif (containsNumber($nomPa) || containsNumber($prenomPa) ){
@@ -326,9 +371,6 @@ session_start(); // On démarre la session AVANT toute chose
                                                                  <th>Action</th>
                                                             </tr>  
                                                        </thead>  
-                                                            
-                                                                 
-
                                                                  <?php
 
                                                                  /*
@@ -363,14 +405,13 @@ session_start(); // On démarre la session AVANT toute chose
                                                                       <?php
                                                                       unset($_POST['delProp']);
                                                                  }
-
                                                             ?> 
                                                             </form>
                                              </table>
                                              
                                         </div>
-                                   <?php
-                              }
+                                        <?php
+                                   }
                          ?>
                               
                               
