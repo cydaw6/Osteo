@@ -65,13 +65,11 @@ session_start(); // On démarre la session AVANT toute chose
                          $db -> query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
                          $result = $db -> query("SELECT idProprietaire FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
                          $id = $result->fetch();
-                         echo $id['idProprietaire'] . '  '. $_POST['prenomPa'];
                          /* On valide les modifications */
                          $db->commit();
-
                          $x = $db->prepare("INSERT INTO `particulier` (idProprietaire, nomPa, prenomPa, telPa, emailPa, adresse, localite, codePostal) VALUES (:a, :b, :c, :d, :e, :f, :g, :h)");
                          $x -> execute(array(
-                              ':a'=> $id['idProprietaire'],
+                              'a'=> $id['idProprietaire'],
                               'b'=> $_POST['nomPa'], 
                               'c'=> $_POST['prenomPa'], 
                               'd'=> $_POST['telPa'], 
@@ -80,7 +78,6 @@ session_start(); // On démarre la session AVANT toute chose
                               'g'=> $_POST['localite'], 
                               'h'=> $_POST['codePostal']
                          ));
-
                          $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
                          $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
                          /* On rafraichi la page */
@@ -89,8 +86,8 @@ session_start(); // On démarre la session AVANT toute chose
                          <?php
                     }
 
-                    function addPersonalParticulier($db, $id){
-                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:userID, :idProp) ");
+                    function addPersonalProprio($db, $id){
+                         $possedeProprio = $db ->prepare("INSERT INTO `possede_proprio` VALUES(:idProp, :userID) ");
                          $possedeProprio -> execute(['userID' =>  $_SESSION['id'], 'idProp' => $id]);
                          /* On rafraichi la page */
                          ?>
@@ -125,7 +122,8 @@ session_start(); // On démarre la session AVANT toute chose
                          <?php
                               if(isset($_POST['printChoice'])){
                                    if($_POST['printChoice']=="Orga"){
-                                        $tableOrga=$db->query("Select idProprietaire, raisonSociale, typeOrga FROM organisme");
+                                        $a= $_SESSION['id'];
+                                        $tableOrga=$db->query("SELECT idProprietaire, raisonSociale, typeOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
                                         $typeOrga=$db->query("SELECT * FROM type_orga");
                                         ?>
                                              
@@ -138,12 +136,11 @@ session_start(); // On démarre la session AVANT toute chose
                                                   <form method="post" action="./proprietaires.php">
                                                        <input type="text" name="raison" placeholder="Raison sociale" required>
                                                        <select name="typeOrga" required>
-                                                       <option> Type </option>
+                                                       <option value="">None</option>
                                                        <?php
                                                             while($t=$typeOrga->fetch()){
                                                                  echo '<option value="'. $t['typeOrga'] .'">'. $t['typeOrga'] .' </option>';
                                                             }
-
                                                        ?>
                                                        </select>
                                                        <!-- on fait en sorte que ce soit la page des organisations qui s'affiche au refresh -->
@@ -160,10 +157,43 @@ session_start(); // On démarre la session AVANT toute chose
                                                   ?>
                                              </div>
                                         <?php
-                                             if(isset($_POS['subOrga'])){
-                                                  if(containsSpecialChars($_POS['raison'])){
+                                             if(isset($_POST['subOrga'])){
+                                                  if(containsSpecialChars($_POST['raison'])){
                                                        echo 'Les caractères spéciaux ne sont pas autorisés';
+                                                  }else{
+                                                       /* On verif que l'organisme n'existe pas déjà */
+                                                       $alreadyExist=$db->prepare("SELECT raisonSociale FROM organisme NATURAL JOIN possede_proprio WHERE raisonSociale=:a AND osteo_id=:b");
+                                                       $alreadyExist->execute(['a'=> $_POST['raison'], 'b'=>$_SESSION['id']]);
+
+                                                       if($alreadyExist->rowCount() >= 1){
+                                                            echo 'Cette organisme est déjà enregistré';
+                                                       }else{
+                                                            // il n'existe pas dans ses propres enregistrement, on verif maintenant dans la base générale WHERE raisonSociale=$a LIMIT $b
+                                                            
+                                                            
+                                                            $alreadyExist=$db->prepare("SELECT idProprietaire FROM organisme WHERE raisonSociale=:a");
+                                                            $alreadyExist->execute(['a'=>$_POST['raison']]);
+                                                            if($alreadyExist->rowCount() == 1){
+                                                                 $res= $alreadyExist->fetch();
+                                                                 addPersonalProprio($db, $res['idProprietaire']);
+                                                            }else{ // sinon on l'ajoute et au général
+
+                                                                 $db -> beginTransaction(); // Opération sécurisée car plusieurs personnes peuvent ajouter des propriétaires !
+                                                                 $db -> query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
+                                                                 $result = $db -> query("SELECT idProprietaire FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
+                                                                 $id = $result->fetch();
+                                                                 echo $id['idProprietaire'];
+                                                                 /* On valide les modifications */
+                                                                 $db->commit();
+
+                                                                 $op = $db->prepare("INSERT INTO organisme VALUES(:id, :rSoc, :typeO)");
+                                                                 $res= $op->execute(['id'=>$id['idProprietaire'], 'rSoc'=>$_POST['raison'], 'typeO'=>$_POST['typeOrga']]);
+                                                                 addPersonalProprio($db, $id['idProprietaire']);
+                                                            }
+
+                                                       }
                                                   }
+
                                              }
                                         ?>
                                              <h3 align="center"> Organismes </h3>  
@@ -186,6 +216,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                                                                <input type="hidden" name="idProp" value="'. $t['idProprietaire'] .'" >
                                                                                                <input type="submit" name="majProp" value="modifier">
                                                                                                <input type="submit" name="delProp" value="supprimer">
+                                                                                               <input type="submit" name="delProp" value="Voir les contacts">
                                                                                                '.
                                                                                 "</td></tr>";  
                                                                  }  
@@ -193,6 +224,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                   </table>  
                                              </div> 
                                         <?php
+                                        
                                    }
                               }
 
@@ -261,7 +293,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                                                 echo 'Cette personne est déjà enregistrée';
 
                                                                            }else{
-                                                                                addPersonalParticulier($db,$samePersonID['idProprietaire']);
+                                                                                addPersonalProprio($db,$samePersonID['idProprietaire']);
                                                                            }
                                                                       }else{
                                                                            addParticulier($db);
