@@ -34,7 +34,7 @@ session_start(); // On démarre la session AVANT toute chose
 <body>
 
 
-  <div id="contain-page" style="">
+  <div id="contain-page">
     <!-- conteneur de ce qui contient du texte . En dehors = aucune interaction-->
 
 

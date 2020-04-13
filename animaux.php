@@ -74,7 +74,7 @@ session_start(); // On démarre la session AVANT toute chose
                $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
                ?>
                <br>
-               <div style="position= relative; padding = 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+               <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
                     <center>
                          <br>
                          Ajouter un animal
@@ -82,7 +82,7 @@ session_start(); // On démarre la session AVANT toute chose
                          <br>
                          <form method="post" action="?">
                               Propriétaire
-                              <select name="organisme" required>
+                              <select name="idproprio" required>
                                    <option value="null"> Définir un propriétaire</option>
                                    <?php
                                    while ($t = $allProprio->fetch()) {
@@ -90,9 +90,9 @@ session_start(); // On démarre la session AVANT toute chose
                                    }
                                    ?>
                               </select><br>
-                              <input type="text" name="nomAn" placeholder="nom" required><br>
-                              <input type="text" name="especeAn" placeholder="espece" required><br>
-                              <input type="text" name="raceAn" placeholder="race" required><br>
+                              <input type="text" name="nom" placeholder="nom" required><br>
+                              <input type="text" name="espece" placeholder="espece" required><br>
+                              <input type="text" name="race" placeholder="race" required><br>
                               <select name="sexe">
                                    <option>Sexe:</option>
                                    <option value="m">Mâle</option>
@@ -103,62 +103,49 @@ session_start(); // On démarre la session AVANT toute chose
                                    <option value="n">non</option>
                                    <option value="o">oui</option>
                               </select><br>
-                              <input type="text" name="taille" placeholder="Taille" required><br>
-                              <input type="text" name="poids" placeholder="Poids" required><br>
+                              <input type="text" name="taille" placeholder="Taille (22.55)" required><br>
+                              <input type="text" name="poids" placeholder="Poids (2.55)" required><br>
                               <p>Anamnese</p>
-                              <textarea id="story" name="story" rows="5" cols="33"></textarea>
+                              <textarea id="story" name="anamnese" rows="5" cols="33"></textarea>
                               <br>
-                              <input type="submit" name="subProp" value="Ajouter">
+                              <input type="submit" name="subAn" value="Ajouter">
                               <input type="reset" value="Effacer" onAction=>
                               <br>
                               <br>
                          </form>
-
                          <?php
-                         if (isset($_POST['subProp'])) {
+                         if (isset($_POST['subAn'])) {
                               extract($_POST);
                               if (
-                                   containsSpecialChars($nomPa) || containsSpecialChars($prenomPa) ||
-                                   containsSpecialChars($telPa) || containsSpecialChars($adresse) ||
-                                   containsSpecialChars($nomPa) || containsSpecialChars($codePostal) || containsSpecialChars($fonction)
+                                   containsSpecialChars($nom) || containsSpecialChars($espece) ||
+                                   containsSpecialChars($race) || containsSpecialChars($taille) ||
+                                   containsSpecialChars($poids)
                               ) {
                                    echo 'Les caractères spéciaux ne sont pas autorisés';
-                              } elseif (containsNumber($nomPa) || containsNumber($prenomPa)) {
-                                   echo 'Le nom ou le prénom ne peuvent contenir des nombres';
-                              } elseif (!ctype_digit($telPa)) {
-                                   echo 'Le numéron de téléphone ne doit contenir que des chiffres';
-                              } elseif (!ctype_digit($codePostal)) {
-                                   echo 'Le code postal ne doit contenir que des chiffres';
-                              } elseif (!filter_var($emailPa, FILTER_VALIDATE_EMAIL)) {
-                                   echo 'Adresse email non valide';
-                                   $quer = $db->query("SELECT email FROM particulier WHERE email= :email");
-                                   $quer->execute(['email' => $emailPa]);
-                                   $numb = $quer->rowCount();
-                                   if ($numb >= 1) {
-                                        echo 'Cette adresse email est déjà utilisée';
-                                   }
+                              } elseif (containsNumber($race) || containsNumber($espece)) {
+                                   echo 'La race ou l\'espèce ne peuvent contenir des nombres';
+                              } elseif ((!is_float($taille) || !is_float($poids)) || !is_numeric($taille) || !is_numeric($poids)) {
+                                   echo 'Le poids et la taille doivent être un nombre entier ou réel';
                               } else {
-                                   $homonyme = $db->prepare("SELECT idProprietaire FROM particulier WHERE nomPa= :nomPa AND prenomPa= :prenomPa AND adresse= :adresse AND localite= :localite");
-                                   $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'adresse' => $adresse, 'localite' => $localite]);
-                                   $result = $homonyme->rowCount();
-                                   if ($result >= 1) { # verification dans la base générale
-                                        $samePersonID = $homonyme->fetch();
-                                        $homonyme2 = $db->prepare("SELECT * FROM particulier NATURAL JOIN `possede_proprio` WHERE osteo_id=:osteoId AND idProprietaire=:idProp");
-                                        $homonyme2->execute(['osteoId' => $_SESSION['id'], 'idProp' => $samePersonID['idProprietaire']]);
-                                        $nb = $homonyme2->rowCount();
-
-                                        if ($nb >= 1) { # verification dans la base unique de l'osteo
-                                             echo 'Cette personne est déjà enregistrée';
-                                        } else {
-                                             addPersonalProprio($db, $samePersonID['idProprietaire']);
-                                        }
-                                   } else {
-                                        addParticulier($db);
+                                   $doubleAnimal = $db->prepare("SELECT * FROM animal WHERE nomAnimal= :nom AND espece= :espece AND race= :race AND idProprietaire= :proprioId AND osteo_id= :osteoId");
+                                   $doubleAnimal->execute(['nom' => $nom, 'espece' => $espece, 'race' => $race, 'proprioId' => $idproprio, 'osteoId'=>$_SESSION['id']]);
+                                   $result = $doubleAnimal->rowCount();         
+                                   if ($result >= 1) { # verification dans la base unique de l'osteo
+                                        echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
+                                   }else{
+                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a, :b, :c, :d, :e, :f, :g, :h, :i, :j");
+                                        $createAnimal->execute([
+                                             'a'=> $nom,'b'=> $espece,
+                                             'c'=> $race, 'd'=> $taille,
+                                             'e'=> $poids,'f'=> $sexe,
+                                             'g'=> $castration,'h'=> $anamnese,
+                                             'i'=> $idproprio, 'j'=> $_SESSION['id']
+                                             ]);
+                                        ?>
+                                             <meta http-equiv="refresh" content="0">
+                                        <?php
                                    }
                               }
-                         } else if (isset($_POST['subOrga'])) {
-                              // faire ici les organisations
-                         }
 
                          ?>
 
@@ -167,7 +154,7 @@ session_start(); // On démarre la session AVANT toute chose
 
                <h3 align="center"> Animaux </h3>
                <br />
-               <div class="table-responsive" style="position=relative;">
+               <div class="table-responsive" style="position:relative;">
                     <table id="employee_data" class="table table-striped table-bordered">
                          <thead>
                               <tr>
@@ -202,10 +189,6 @@ session_start(); // On démarre la session AVANT toute chose
                </div>
           </div>
      </div>
-</body>
-
-</html>
-
 <script>
      $(document).ready(function() {
           $('#employee_data').DataTable({
@@ -215,3 +198,5 @@ session_start(); // On démarre la session AVANT toute chose
           });
      });
 </script>
+</body>
+</html>

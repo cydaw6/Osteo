@@ -61,16 +61,13 @@ session_start(); // On démarre la session AVANT toute chose
                <br>
                <br>
                <center>
-
-
                     <br>
-
                     <?php
 
                     $allOrga = $db->query("SELECT * FROM organisme ORDER BY raisonSociale");
                     ?>
                     <br>
-                    <div style="position= relative; padding = 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                    <div style="position: relative; padding: 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
                          <br>
                          Ajouter un particulier
                          <br>
@@ -103,9 +100,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    ?>
                               </select>
                               <input type="text" name="fonction" placeholder="Fonction">
-
                               <br>
-
                               <input type="submit" name="subProp" value="Ajouter">
                               <input type="reset" value="Effacer" onAction=>
                               <br>
@@ -154,20 +149,15 @@ session_start(); // On démarre la session AVANT toute chose
                                         addParticulier($db);
                                    }
                               }
-                         } else if (isset($_POST['subOrga'])) {
-                              // faire ici les organisations
                          }
-
                          ?>
-
                     </div>
                     <br>
           </div>
           <center>
-
                <h3 align="center"> Particuliers </h3>
                <br />
-               <div class="table-responsive" style="position=relative;">
+               <div class="table-responsive" style="position:relative;">
                     <table id="employee_data" class="table table-striped table-bordered">
                          <thead>
                               <tr>
@@ -182,11 +172,6 @@ session_start(); // On démarre la session AVANT toute chose
                               </tr>
                          </thead>
                          <?php
-
-                         /*
-                                                       "</td><td>".' | '. '<button id ="'. $t['idProprietaire'] .'" >Modifier</button> <button id=" ' . $t['idProprietaire'] .' " onClick="supprProp(this.id)">supprimer</button>'.
-                                                       */
-
                          while ($t = $tableParticulier->fetch()) {
                               echo "<tr><td>" . $t['nomPa'] .
                                    "</td><td>" . $t['prenomPa'] .
@@ -196,14 +181,12 @@ session_start(); // On démarre la session AVANT toute chose
                                    "</td><td>" . $t['localite'] .
                                    "</td><td>" . $t['codePostal'] .
                                    "</td><td>" . ' ' . '<form method="post" action="?">
-                                                                                     <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
-                                                                                     <input type="submit" name="majProp" value="modifier">
-                                                                                     <input type="submit" name="delProp" value="supprimer">
-                                                                                     </form>
-                                                                                     ' .
+                                                            <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
+                                                            <input type="submit" name="majProp" value="modifier">
+                                                            <input type="submit" name="delProp" value="supprimer">
+                                                       </form>' .
                                    "</td></tr>";
                          }
-
                          /* On gère la suppression du propriétaire */
                          if (isset($_POST['delProp'])) {
                               $s = $_SESSION['id'];
