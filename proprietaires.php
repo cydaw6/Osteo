@@ -123,7 +123,7 @@ session_start(); // On démarre la session AVANT toute chose
                          <br>
                          <br>
                          <center>
-                              <form method="post" action="./proprietaires.php" >
+                              <form method="post" action="?" >
                               <select name="printChoice" onchange="this.form.submit()" >
                                    <option value="Affichage">Affichage</option>
                                    <option value="Proprio">Particuliers</option>
@@ -157,7 +157,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                   Ajouter un organisme 
                                                   <br>
                                                   <br>
-                                                  <form method="post" action="./proprietaires.php">
+                                                  <form method="post" action="?">
                                                        <input type="text" name="raison" placeholder="Raison sociale" required>
                                                        <select name="typeOrga" required>
                                                        <option value="">None</option>
@@ -234,12 +234,13 @@ session_start(); // On démarre la session AVANT toute chose
                                                                  {  
                                                                       echo "<tr><td>".$t['raisonSociale'].
                                                                                 "</td><td>".$t['typeOrga'].
-                                                                                "</td><td>".' '. '<form method="post" action="./proprietaires.php">
+                                                                                "</td><td>".' '. '<form method="post" action="?">
                                                                                                <input type="hidden" name="idOrga" value="'. $t['idProprietaire'] .'" >
                                                                                                <input type="submit" name="seeOrga" value="Voir les contacts">
                                                                                                <input hidden name="printChoice" value="Orga">
                                                                                                <input hidden name="print">
                                                                                                <input type="submit" name="delOrga" value="supprimer">
+                                                                                               </form>
                                                                                                '.
                                                                                 "</td></tr>";  
                                                                  }  
@@ -266,9 +267,10 @@ session_start(); // On démarre la session AVANT toute chose
                                                   <?php
                                                   if(isset($_SESSION['shownContacts'])){
                                                        // Affichage de la liste des contacts de l'organisme !! A CHANGER EN PAGE vu que le form marche pas impossible de supprimer le contact
-                                                       $chemin= getcwd().'\proprietaires.php';
+                                                       $chemin= './proprietaires.php';
                                                        $a = $_SESSION['shownContacts'];
                                                        include("./includes/orga-contacts.php");
+                                                       
                                                   }
                                                   ?>
                                              </div> 
@@ -285,7 +287,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                        Ajouter un particulier
                                                        <br>
                                                        <br>
-                                                       <form method="post" action="./proprietaires.php">
+                                                       <form method="post" action="?">
                                                             <input type="text" name="nomPa" placeholder="Nom" required>
                                                             <input type="text" name="prenomPa" placeholder="Prénom" required>
                                                             <input type="text" name="telPa" placeholder="Téléphone" required>
@@ -398,10 +400,11 @@ session_start(); // On démarre la session AVANT toute chose
                                                                            "</td><td>".$t['adresse'].
                                                                            "</td><td>".$t['localite'].
                                                                            "</td><td>".$t['codePostal'].
-                                                                           "</td><td>".' '. '<form method="post" action="./proprietaires.php">
+                                                                           "</td><td>".' '. '<form method="post" action="?">
                                                                                                <input type="hidden" name="idProp" value="'. $t['idProprietaire'] .'" >
                                                                                                <input type="submit" name="majProp" value="modifier">
                                                                                                <input type="submit" name="delProp" value="supprimer">
+                                                                                               </form>
                                                                                                '.
                                                                            "</td></tr>";
                                                                       

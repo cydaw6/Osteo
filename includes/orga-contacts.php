@@ -28,7 +28,10 @@
 <html>
     <body>
         <?php
-            $allContacts = $db->prepare("SELECT * FROM a_contacter NATURAL JOIN particulier JOIN organisme o ON idProprietaire_ORGANISME = o.idProprietaire WHERE idProprietaire_ORGANISME=:a");
+            $allContacts = $db->prepare("SELECT p.idProprietaire, p.nomPa, p.prenomPa, p.telPa, p.emailPa, p.adresse, p.localite, p.codePostal, ac.fonction 
+                                            FROM a_contacter ac NATURAL JOIN particulier p JOIN organisme o ON idProprietaire_ORGANISME = o.idProprietaire 
+                                            WHERE idProprietaire_ORGANISME=:a");
+
             $allContacts->execute(['a'=> $a]);
 
             $result = $db->prepare("SELECT * FROM organisme WHERE idProprietaire=:a");
@@ -63,10 +66,18 @@
                                 "</td><td>".' '. '<form method="post" action="?">
                                                     <input type="hidden" name="idProp" value="'. $t['idProprietaire'] .'" >
                                                     <input type="submit" name="delPropContacts" value="supprimer">
+                                                    </form>
                                                     '.
                                 "</td></tr>";
                     }
                 echo '</table>';
+                if(isset($_POST['delPropContacts'])){
+                    $r = $db->prepare("DELETE FROM a_contacter WHERE idProprietaire=:x");
+                    $r->execute(['x'=>$_POST['idProp']]);
+                    ?>
+                    <meta http-equiv="refresh" content="0"> 
+                    <?php
+                }
 
             ?>
         </div>
