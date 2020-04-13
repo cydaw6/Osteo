@@ -13,4 +13,3 @@
 							}catch(PDOException $e){
 								echo "Impossible d'établir une connexion avec la base de données";
 							}
-					?>
