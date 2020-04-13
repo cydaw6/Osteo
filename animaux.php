@@ -46,12 +46,27 @@ session_start(); // On démarre la session AVANT toute chose
           include './includes/header.php';
           include './includes/right-navbar.php';
           include './includes/database.php'; // Connexion à la bdd
-          $a = $_SESSION['id'];
-          $tableAnimal = $db->query("SELECT * FROM animal WHERE osteo_id=$a");
+          $idosteo = $_SESSION['id'];
+          $tableAnimal = $db->query("SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, raisonSociale prenom, typeOrga nom FROM `animal` NATURAL JOIN organisme
+          UNION
+          SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, prenomPa, nomPa FROM animal NATURAL JOIN particulier ");
 
+
+
+          /*
+          
+                                   */
           function containsSpecialChars($str)
           {
                if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬]/', $str)) {
+                    return true;
+               }
+               return false;
+          }
+
+          function containsNumber($str)
+          {
+               if (preg_match('#[0-9]#', $str)) {
                     return true;
                }
                return false;
@@ -124,29 +139,29 @@ session_start(); // On démarre la session AVANT toute chose
                                    echo 'Les caractères spéciaux ne sont pas autorisés';
                               } elseif (containsNumber($race) || containsNumber($espece)) {
                                    echo 'La race ou l\'espèce ne peuvent contenir des nombres';
-                              } elseif ((!is_float($taille) || !is_float($poids)) || !is_numeric($taille) || !is_numeric($poids)) {
+                              } elseif (!is_numeric($taille) || !is_numeric($poids)) {
                                    echo 'Le poids et la taille doivent être un nombre entier ou réel';
                               } else {
                                    $doubleAnimal = $db->prepare("SELECT * FROM animal WHERE nomAnimal= :nom AND espece= :espece AND race= :race AND idProprietaire= :proprioId AND osteo_id= :osteoId");
-                                   $doubleAnimal->execute(['nom' => $nom, 'espece' => $espece, 'race' => $race, 'proprioId' => $idproprio, 'osteoId'=>$_SESSION['id']]);
-                                   $result = $doubleAnimal->rowCount();         
+                                   $doubleAnimal->execute(['nom' => $nom, 'espece' => $espece, 'race' => $race, 'proprioId' => $idproprio, 'osteoId' => $_SESSION['id']]);
+                                   $result = $doubleAnimal->rowCount();
                                    if ($result >= 1) { # verification dans la base unique de l'osteo
                                         echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
-                                   }else{
-                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a, :b, :c, :d, :e, :f, :g, :h, :i, :j");
+                                   } else {
+                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j)");
                                         $createAnimal->execute([
-                                             'a'=> $nom,'b'=> $espece,
-                                             'c'=> $race, 'd'=> $taille,
-                                             'e'=> $poids,'f'=> $sexe,
-                                             'g'=> $castration,'h'=> $anamnese,
-                                             'i'=> $idproprio, 'j'=> $_SESSION['id']
-                                             ]);
-                                        ?>
-                                             <meta http-equiv="refresh" content="0">
-                                        <?php
+                                             'a' => $nom, 'b' => $espece,
+                                             'c' => $race, 'd' => $taille,
+                                             'e' => $poids, 'f' => $sexe,
+                                             'g' => $castration, 'h' => $anamnese,
+                                             'i' => $idproprio, 'j' => $_SESSION['id']
+                                        ]);
+                         ?>
+                                        <meta http-equiv="refresh" content="0">
+                         <?php
                                    }
                               }
-
+                         }
                          ?>
 
                </div>
@@ -166,18 +181,28 @@ session_start(); // On démarre la session AVANT toute chose
                                    <th>Sexe</th>
                                    <th>Castration</th>
                                    <th>Propriétaire</th>
+                                   <th>Action</th>
+
                               </tr>
                          </thead>
                          <?php
-                         while ($t = $tableAnimal->fetch()) {
-                              "<tr><td>" . $t['nomAnimal'] .
-                                   "</td><td>" . $t['espece'] .
-                                   "</td><td>" . $t['race'] .
-                                   "</td><td>" . $t['taille'] .
-                                   "</td><td>" . $t['poids'] .
-                                   "</td><td>" . $t['sexe'] .
-                                   "</td><td>" . $t['castration'] .
-                                   "</td><td>" . $t['nom'] . ' ' . $t['prenom'] .
+                         while ($x = $tableAnimal->fetch()) {
+                              $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
+                              $c = ($x['castration'] == "o") ? 'oui' : 'non';
+
+                              echo "<tr><td>" . $x['nomAnimal'] .
+                                   "</td><td>" . $x['espece'] .
+                                   "</td><td>" . $x['race'] .
+                                   "</td><td>" . $x['taille'] . ' cm' .
+                                   "</td><td>" . $x['poids'] . ' kg' .
+                                   "</td><td>" . $s .
+                                   "</td><td>" . $c .
+                                   "</td><td>" . $x['nom'] . ' ' . $x['prenom'] .
+                                   "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
+                                                            <input type="hidden" name="idProp" value="' . $x['idProprietaire'] . '" >
+                                                            <input type="submit" name="majAnimal" value="modifier">
+                                                            <input type="submit" name="delAnimal" value="supprimer">
+                                                       </form>' .
                                    "</td></tr>";
                          }
                          ?>
@@ -189,6 +214,10 @@ session_start(); // On démarre la session AVANT toute chose
                </div>
           </div>
      </div>
+
+</body>
+
+</html>
 <script>
      $(document).ready(function() {
           $('#employee_data').DataTable({
@@ -198,5 +227,3 @@ session_start(); // On démarre la session AVANT toute chose
           });
      });
 </script>
-</body>
-</html>
