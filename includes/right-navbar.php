@@ -174,7 +174,7 @@ background:#262626;
               <li><div class="icons"><button type="submit" name="profil"><i class="fa fa-heart"></i></div></button><div class="linktitle">Récapitulatif</div>
 
               </li>
-              <li><div class="icons"><button type="submit" name="profil"><i class="fa fa-align-justify"></i></div></button><div class="linktitle">Consultations</div>
+              <li><div class="icons"><a href="./consultations.php"><i class="fa fa-align-justify"></i></div></a><a href="./consultations.php"><div class="linktitle">Consultations</div></a>
 
               </li>
               <li><div class="icons"><a href="./animaux.php"><i class="fa fa-paw"></i></div></a><a href="./animaux.php"><div class="linktitle">Animaux</div></a>

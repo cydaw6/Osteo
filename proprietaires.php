@@ -302,7 +302,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                                  <option value="null"> Organisme</option>
                                                                  <?php
                                                                       while($t=$allOrga->fetch()){
-                                                                           echo '<option value="'.$t['idProprietaire'].'">'. $t['raisonSociale'] . '-' . $t['typeOrga'] .'"</option>';
+                                                                           echo '<option value="'.$t['idProprietaire'].'">'. $t['raisonSociale'] . '-' . $t['typeOrga'] .'</option>';
                                                                       }
                                                                  ?>
                                                             </select>
