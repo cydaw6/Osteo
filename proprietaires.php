@@ -387,8 +387,8 @@ session_start(); // On démarre la session AVANT toute chose
                                    <?php
 
                                    /*
-                                                                 "</td><td>".' | '. '<button id ="'. $t['idProprietaire'] .'" >Modifier</button> <button id=" ' . $t['idProprietaire'] .' " onClick="supprProp(this.id)">supprimer</button>'.
-                                                                 */
+                                   "</td><td>".' | '. '<button id ="'. $t['idProprietaire'] .'" >Modifier</button> <button id=" ' . $t['idProprietaire'] .' " onClick="supprProp(this.id)">supprimer</button>'.
+                                   */
 
                                    while ($t = $tableParticulier->fetch()) {
                                         echo "<tr><td>" . $t['nomPa'] .
