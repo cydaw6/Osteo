@@ -94,9 +94,7 @@ session_start(); // On démarre la session AVANT toute chose
                               // echo $id['idProprietaire'].' '.$_POST['organisme']. ' '.$_POST['fonction'];
                               $ajout = $db->prepare("INSERT INTO a_contacter VALUES(:idProprio, :idOrga, :fonction)");
                               $ajout->execute(['idProprio' => $id['idProprietaire'], 'idOrga' => $_POST['organisme'] ,'fonction' => $fonction]);
-
                          }
-                         
                          /* On rafraichi la page */
                          ?>
                          <meta http-equiv="refresh" content="0"> 
@@ -254,9 +252,25 @@ session_start(); // On démarre la session AVANT toute chose
                                                                       <meta http-equiv="refresh" content="0"> 
                                                                       <?php
                                                                       unset($_POST['delOrga']);
+
+                                                                 }elseif(isset($_POST['seeOrga'])){
+                                                                      // on définie dans une variable de session l'organisme dont on souhaite voire les contacts
+                                                                      $_SESSION['shownContacts']=$_POST['idOrga'];
                                                                  }
+
+                                                                 
+                                                                 
                                                             ?>  
-                                                  </table>  
+                                                  </table>
+                                                  <br><br><br>
+                                                  <?php
+                                                  if(isset($_SESSION['shownContacts'])){
+                                                       // Affichage de la liste des contacts de l'organisme !! A CHANGER EN PAGE vu que le form marche pas impossible de supprimer le contact
+                                                       $chemin= getcwd().'\proprietaires.php';
+                                                       $a = $_SESSION['shownContacts'];
+                                                       include("./includes/orga-contacts.php");
+                                                  }
+                                                  ?>
                                              </div> 
                                         <?php
                                    }   
@@ -301,8 +315,6 @@ session_start(); // On démarre la session AVANT toute chose
                                                        </form>
                                                        
                                                        <?php
-
-                                                       
                                                             if(isset($_POST['subProp'])){
                                                                  extract($_POST);
                                                                  if(containsSpecialChars($nomPa) || containsSpecialChars($prenomPa) || 
