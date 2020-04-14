@@ -81,7 +81,7 @@ session_start(); // On démarre la session AVANT toute chose
 
                <?php
                // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
-               $allProprio = $db->query("SELECT * FROM nom_proprio");
+               $allProprio = $db->query("SELECT * FROM nom_proprio ORDER BY nom");
                $a = $_SESSION['id'];
                $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
                ?>
@@ -95,7 +95,7 @@ session_start(); // On démarre la session AVANT toute chose
                          <form method="post" action="?">
                               Propriétaire
                               <select name="idproprio" required>
-                                   <option value="null"> Définir un propriétaire</option>
+                                   <option value=""> None</option>
                                    <?php
                                    while ($t = $allProprio->fetch()) {
                                         echo '<option value="' . $t['idProprietaire'] . '">' . $t['nom'] . '-' . $t['prenom'] . '</option>';
@@ -105,8 +105,9 @@ session_start(); // On démarre la session AVANT toute chose
                               <input type="text" name="nom" placeholder="nom" required><br>
                               <input type="text" name="espece" placeholder="espece" required><br>
                               <input type="text" name="race" placeholder="race" required><br>
-                              <select name="sexe">
-                                   <option>Sexe:</option>
+                              Sexe:
+                              <select name="sexe" required>
+                                   <option value="">None</option>
                                    <option value="m">Mâle</option>
                                    <option value="f">Femelle</option>
                               </select>
@@ -194,7 +195,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    "</td><td>" . $x['poids'] . ' kg' .
                                    "</td><td>" . $s .
                                    "</td><td>" . $c .
-                                   "</td><td>" . $x['nom'] . ' - ' . $x['prenom'] .
+                                   "</td><td>" . $x['nom'] . '  ' . $x['prenom'] .
                                    "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
                                                             <input type="hidden" name="idAnimal" value="' . $x['idAnimal'] . '" >
                                                             <input type="submit" name="majAnimal" value="modifier">

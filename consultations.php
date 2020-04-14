@@ -179,33 +179,50 @@ session_start(); // On démarre la session AVANT toute chose
                          <br>
                          <br>
                          <form method="post" action="?">
-                              Propriétaire
-                              <select name="idproprio" required>
-                                   <option value="null"> Définir un propriétaire</option>
+                              <br> Durée:
+                              <select name="heure">
+                                   <option value="0" selected>0</option>
                                    <?php
-                                   while ($t = $allProprio->fetch()) {
-                                        echo '<option value="' . $t['idProprietaire'] . '">' . $t['nom'] . '-' . $t['prenom'] . '</option>';
+                                   for ($i = 1; $i <= 24; $i++) {
+                                        echo '<option value="' . $i . '">' . $i . '</option>';
                                    }
                                    ?>
-                              </select><br>
-                              <input type="text" name="nom" placeholder="nom" required><br>
-                              <input type="text" name="espece" placeholder="espece" required><br>
-                              <input type="text" name="race" placeholder="race" required><br>
-                              <select name="sexe">
-                                   <option>Sexe:</option>
-                                   <option value="m">Mâle</option>
-                                   <option value="f">Femelle</option>
                               </select>
-                              <label for="castration">Castration:</label>
-                              <select name="castration">
-                                   <option value="n">non</option>
-                                   <option value="o">oui</option>
-                              </select><br>
+                              h
+                              <select name="min">
+                                   <option value="0" selected>0</option>
+                                   <?php
+                                   for ($i = 1; $i <= 59; $i++) {
+                                        echo '<option value="' . $i . '">' . $i . '</option>';
+                                   }
+                                   ?>
+                              </select>
+                              min
+                              <select name="sec">
+                                   <option value="0" selected>0</option>
+                                   <?php
+                                   for ($i = 1; $i <= 59; $i++) {
+                                        echo '<option value="' . $i . '">' . $i . '</option>';
+                                   }
+                                   ?>
+                              </select>
+                              sec
+
+                              <br>
                               <input type="text" name="taille" placeholder="Taille (22.55)" required><br>
                               <input type="text" name="poids" placeholder="Poids (2.55)" required><br>
                               <p>Anamnese</p>
-                              <textarea id="story" name="anamnese" rows="5" cols="33"></textarea>
+                              <textarea id="story" name="anamnese" rows="3" cols="80"></textarea>
                               <br>
+                              <p>Diagnostique</p>
+                              <textarea id="story" name="diagnostic" rows="3" cols="80"></textarea>
+                              <br>
+                              <p>Manipulations</p>
+                              <textarea id="story" name="manip" rows="3" cols="80"></textarea>
+                              <br>
+                              <select name="suivi">
+                                   <option value="" selected> non </option>
+                              </select>
                               <input type="submit" name="subAn" value="Ajouter">
                               <input type="reset" value="Effacer" onAction=>
                               <br>
