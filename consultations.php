@@ -101,6 +101,7 @@ session_start(); // On démarre la session AVANT toute chose
      <br /><br />
 
      <div style="padding-left: 170px; margin-right: 0px; margin-left: 0px; background-color:white; max-width: 100%;">
+
           <div class="container" style="background-color: white; max-width: 1060px; min-width: 100px!important;">
                <br>
                <br>
@@ -119,33 +120,22 @@ session_start(); // On démarre la session AVANT toute chose
                     <?php
                     if (isset($_POST['choiceAnimal'])) {
                          $_SESSION['choixAnimalConsult'] = $_POST['choiceAnimal'];
-                         echo 'echoooooooooooooo';
                     }
 
                     ?>
                </form>
+
                <?php
-
-
-
-
                // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
                $allProprio = $db->query("SELECT * FROM nom_proprio");
                $a = $_SESSION['id'];
                $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
+               echo '<br>';
+               if ($_SESSION['choixAnimalConsult'] != "-1") {
+                    $idAnimal = $_SESSION['choixAnimalConsult'];
+                    $infoAnimal = $db->query("SELECT * FROM `animal` NATURAL JOIN nom_proprio WHERE idAnimal=$idAnimal");
 
-
-               ?>
-               <br>
-               <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
-                    <center>
-                         <?php
-                         if ($_SESSION['choixAnimalConsult'] != "-1") {
-                              $idAnimal = $_SESSION['choixAnimalConsult'];
-                              echo $idAnimal;
-                              $infoAnimal = $db->query("SELECT * FROM `animal` NATURAL JOIN nom_proprio WHERE idAnimal=$idAnimal");
-
-                              echo '<table id="describeAnimal">
+                    echo '<table id="describeAnimal">
                               <tr>
                                    <th>Nom</th>
                                    <th>Espèce</th>
@@ -156,31 +146,34 @@ session_start(); // On démarre la session AVANT toute chose
                                    <th>Castration</th>
                                    <th>Propriétaire</th>
                               <tr>';
-                              while ($x = $infoAnimal->fetch()) {
-                                   $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
-                                   $c = ($x['castration'] == "o") ? 'oui' : 'non';
+                    while ($x = $infoAnimal->fetch()) {
+                         $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
+                         $c = ($x['castration'] == "o") ? 'oui' : 'non';
 
-                                   echo "
+                         echo "
                               <tr>
                                    <td>" . $x['nomAnimal'] .
-                                        "</td>
+                              "</td>
                                    <td>" . $x['espece'] .
-                                        "</td>
+                              "</td>
                                    <td>" . $x['race'] .
-                                        "</td>
+                              "</td>
                                    <td>" . $x['taille'] . ' cm' .
-                                        "</td>
+                              "</td>
                                    <td>" . $x['poids'] . ' kg' .
-                                        "</td>
+                              "</td>
                                    <td>" . $s .
-                                        "</td>
+                              "</td>
                                    <td>" . $c .
-                                        "</td>
+                              "</td>
                                    <td>" . $x['nom'] . ' ' . $x['prenom'] .
-                                        "</td>
-                              </tr>";
-                              }
-                         } ?>
+                              "</td>
+                              </tr></table>";
+                    }
+               } ?>
+               <br>
+               <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                    <center>
                          <br>
                          Ajouter un animal
                          <br>

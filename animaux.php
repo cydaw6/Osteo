@@ -197,7 +197,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    "</td><td>" . $x['poids'] . ' kg' .
                                    "</td><td>" . $s .
                                    "</td><td>" . $c .
-                                   "</td><td>" . $x['nom'] . ' ' . $x['prenom'] .
+                                   "</td><td>" . $x['nom'] . ' - ' . $x['prenom'] .
                                    "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
                                                             <input type="hidden" name="idProp" value="' . $x['idProprietaire'] . '" >
                                                             <input type="submit" name="majAnimal" value="modifier">
