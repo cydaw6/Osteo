@@ -48,14 +48,11 @@ session_start(); // On démarre la session AVANT toute chose
           include './includes/database.php'; // Connexion à la bdd
           $idosteo = $_SESSION['id'];
           $tableAnimal = $db->query("SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, raisonSociale prenom, typeOrga nom FROM `animal` NATURAL JOIN organisme
-          UNION
-          SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, prenomPa, nomPa FROM animal NATURAL JOIN particulier ");
+                                   UNION
+                                   SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, prenomPa, nomPa FROM animal NATURAL JOIN particulier 
+                                   ");
 
 
-
-          /*
-          
-                                   */
           function containsSpecialChars($str)
           {
                if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬]/', $str)) {
@@ -199,7 +196,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    "</td><td>" . $c .
                                    "</td><td>" . $x['nom'] . ' - ' . $x['prenom'] .
                                    "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
-                                                            <input type="hidden" name="idProp" value="' . $x['idProprietaire'] . '" >
+                                                            <input type="hidden" name="idAnimal" value="' . $x['idAnimal'] . '" >
                                                             <input type="submit" name="majAnimal" value="modifier">
                                                             <input type="submit" name="delAnimal" value="supprimer">
                                                        </form>' .
@@ -207,6 +204,18 @@ session_start(); // On démarre la session AVANT toute chose
                          }
                          ?>
                     </table>
+
+                    <?php
+                    if (isset($_POST['delAnimal'])) {
+                         $x = $_POST['idAnimal'];
+                         $db->query("DELETE FROM animal WHERE idAnimal=$x");
+                    ?>
+                         <meta http-equiv="refresh" content="0">
+                    <?php
+                    }
+
+
+                    ?>
                </div>
                <div id="bottom-bar">
                     <!-- logo univ-->

@@ -277,7 +277,7 @@ session_start(); // On démarre la session AVANT toute chose
                          }
 
 
-                         if ($_SESSION['showContentProprio'] == "Particulier") {
+                         if ($_SESSION['showContentProprio'] == "Particulier" || $_SESSION['showContentProprio'] != "Orga") {
                               $allOrga = $db->query("SELECT * FROM organisme ORDER BY raisonSociale");
                          ?>
                               <br>
@@ -296,7 +296,7 @@ session_start(); // On démarre la session AVANT toute chose
                                         <input type="text" name="codePostal" placeholder="Code Postal" required>
                                         <br>
                                         <br>
-                                        Si contact d'une organisation
+                                        Si contact d'un organisme
                                         <select name="organisme">
                                              <option value="null"> Organisme</option>
                                              <?php
@@ -400,6 +400,7 @@ session_start(); // On démarre la session AVANT toute chose
                                              "</td><td>" . $t['codePostal'] .
                                              "</td><td>" . ' ' . '<form method="post" action="?">
                                                                                                <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
+                                                                                               <input type="submit" name="seeAnimals" value="animaux">
                                                                                                <input type="submit" name="majProp" value="modifier">
                                                                                                <input type="submit" name="delProp" value="supprimer">
                                                                                                </form>
