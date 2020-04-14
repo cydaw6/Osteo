@@ -53,7 +53,7 @@
 
     <div>
         <?php
-        echo '<table id="showContacts" style="">
+        echo '<table id="showContacts">
                         <tr>
                             <th>Nom</th>
                             <th>Prénom</th>

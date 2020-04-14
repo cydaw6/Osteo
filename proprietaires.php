@@ -156,7 +156,7 @@ session_start(); // On démarre la session AVANT toute chose
                               $tableOrga = $db->query("SELECT idProprietaire, raisonSociale, typeOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
                               $typeOrga = $db->query("SELECT * FROM type_orga");
                          ?>
-                              <div style="position=relative; padding= 3px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                              <div style="position:relative; padding: 3px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
                                    <br>
                                    Ajouter un organisme
                                    <br>

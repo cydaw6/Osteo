@@ -62,6 +62,7 @@ session_start(); // On démarre la session AVANT toute chose
                 $_SESSION['email'] = $result['email'];
                 $_SESSION['id'] = $result['osteo_id'];
                 $_SESSION['showContentProprio'] = "none";
+                $_SESSION['choixAnimalConsult'] = "-1";
                 echo '<meta http-equiv="refresh" content="1;URL=./index.php">';
               } else {
                 echo '<p style="color: red;">L\'email ou le mot de passe est incorrect</p>';
