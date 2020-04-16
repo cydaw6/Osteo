@@ -180,9 +180,11 @@
 
         </li>
         <li>
-          <div class="icons"><button type="submit" name="medicaments"><i class="fa fa-medkit"></i></div></button>
+          <div class="icons"><a href="./medicaments.php"><i class="fa fa-medkit"></i></a></div><a href="./medicaments.php">
+            <div class="linktitle">Médicaments</div></i>
+          </a>
           <div class="linktitle">
-            <input class="subm" type="submit" name="animaux" value="Médicaments">
+
 
         </li>
         <li>

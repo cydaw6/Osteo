@@ -249,7 +249,7 @@ session_start(); // On démarre la session AVANT toute chose
                                         if (isset($_POST['delOrga'])) {
                                              $s = $_SESSION['id'];
                                              $o = $_POST['idOrga'];
-                                             $db->query("DELETE FROM `possede_proprio` WHERE  osteo_id=$s AND idProprietaire=$o ");
+                                             $db->query("DELETE FROM `possede_proprio` WHERE osteo_id=$s AND idProprietaire=$o ");
                                         ?>
                                              <meta http-equiv="refresh" content="0">
                                         <?php

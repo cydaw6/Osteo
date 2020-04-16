@@ -265,9 +265,66 @@ session_start(); // On démarre la session AVANT toute chose
                          ?>
 
                </div>
+
+               <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                    <center>
+                         <br>
+                         Associer un traitement
+                         <br>
+                         <br>
+                         <form method="post" action="?">
+                              <br>
+                              <input type="text" name="produit" placeholder="Produit"><br>
+                              <input type="text" name="frequence" placeholder="Fréquence"><br>
+                              <input type="text" name="dose" placeholder="Dose"><br>
+                              <input type="text" name="dureeTraitement" placeholder="Durée du Traitement"><br>
+
+
+                              <input type="submit" name="subAn" value="Ajouter">
+                              <input type="reset" value="Effacer" onAction=>
+                              <br>
+                              <br>
+                         </form>
+                         <?php
+                         if (isset($_POST['subAn'])) {
+                              extract($_POST);
+                              if (
+                                   containsSpecialChars($nom) || containsSpecialChars($espece) ||
+                                   containsSpecialChars($race) || containsSpecialChars($taille) ||
+                                   containsSpecialChars($poids)
+                              ) {
+                                   echo 'Les caractères spéciaux ne sont pas autorisés';
+                              } elseif (containsNumber($race) || containsNumber($espece)) {
+                                   echo 'La race ou l\'espèce ne peuvent contenir des nombres';
+                              } elseif (!is_numeric($taille) || !is_numeric($poids)) {
+                                   echo 'Le poids et la taille doivent être un nombre entier ou réel';
+                              } else {
+                                   $doubleAnimal = $db->prepare("SELECT * FROM animal WHERE nomAnimal= :nom AND espece= :espece AND race= :race AND idProprietaire= :proprioId AND osteo_id= :osteoId");
+                                   $doubleAnimal->execute(['nom' => $nom, 'espece' => $espece, 'race' => $race, 'proprioId' => $idproprio, 'osteoId' => $_SESSION['id']]);
+                                   $result = $doubleAnimal->rowCount();
+                                   if ($result >= 1) { # verification dans la base unique de l'osteo
+                                        echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
+                                   } else {
+                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j)");
+                                        $createAnimal->execute([
+                                             'a' => $nom, 'b' => $espece,
+                                             'c' => $race, 'd' => $taille,
+                                             'e' => $poids, 'f' => $sexe,
+                                             'g' => $castration, 'h' => $anamnese,
+                                             'i' => $idproprio, 'j' => $_SESSION['id']
+                                        ]);
+                         ?>
+                                        <meta http-equiv="refresh" content="0">
+                         <?php
+                                   }
+                              }
+                         }
+                         ?>
+
+               </div>
                <br>
 
-               <h3 align="center"> Animaux </h3>
+               <h3 align="center"> Consultations </h3>
                <br />
                <div class="table-responsive" style="position:relative;">
                     <table id="employee_data" class="table table-striped table-bordered">
