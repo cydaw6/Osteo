@@ -218,48 +218,71 @@ session_start(); // On démarre la session AVANT toute chose
                               <br>
                               <input type="text" name="suivi" placeholder="Suivi"><br>
 
-                              <input type="submit" name="subAn" value="Ajouter">
+                              Lieu de la consultation
+                              <select name="lieuConsult" required>
+                                   <option value="">None</option>
+                                   <?php
+                                   $a = $_SESSION['id'];
+                                   $result = $db->query("SELECT * FROM lieu_consultation WHERE osteo_id=$a ORDER BY lieuConsultation");
+                                   while ($t = $result->fetch()) {
+                                        echo '<option value="' . $t['lieuConsultation'] . '">' . $t['lieuConsultation'] . '</option>';
+                                   }
+                                   ?>
+                              </select>
+                              Type de la consultation
+                              <select name="typeConsult" required>
+                                   <option value="">None</option>
+                                   <?php
+                                   $a = $_SESSION['id'];
+                                   $result = $db->query("SELECT * FROM type_consultation WHERE osteo_id=$a ORDER BY typeConsultation");
+                                   while ($t = $result->fetch()) {
+                                        echo '<option value="' . $t['typeConsultation'] . '">' . $t['typeConsultation'] . '</option>';
+                                   }
+                                   ?>
+                              </select>
+
+                              <input type="submit" name="subConsult" value="Ajouter">
                               <input type="reset" value="Effacer" onAction=>
                               <br>
                               <br>
                          </form>
                          <?php
-                         if (isset($_POST['subAn'])) {
+                         if (isset($_POST['subConsult'])) {
                               $anam = (isset($_POST['anamnese'])) ? $_POST['anamnese'] : "-";
                               $diag = (isset($_POST['diagnostic'])) ? $_POST['diagnostic'] : "-";
                               $mani = (isset($_POST['manip'])) ? $_POST['manip'] : "-";
                               $suiv = (isset($_POST['suivi'])) ? $_POST['suivi'] : "-";
                               $dure = $_POST['heure'] . ':' . $_POST['min'] . ':' . $_POST['sec'];
+                              $a = $_SESSION['id'];
+                              //echo $anam . ' ' . $diag . ' ' . $mani . ' ' . $suiv . ' ' . $dure . ' ' . $_POST['lieuConsult'] . ' ' . $_POST['typeConsult'] . ' ' . $_SESSION['choixAnimalConsult'];
 
 
+                              $searchTarif = $db->prepare("SELECT idTarif FROM tarif WHERE osteo_id=:a AND lieuConsultation=:b AND typeConsultation=:c");
+                              $searchTarif->execute(['a' => $a, 'b' => $_POST['lieuConsult'], 'c' => $_POST['typeConsult']]);
 
-                              $createAnimal = $db->prepare("INSERT INTO consultation VALUES(DEFAULT, DEFAULT, :b, :c, :d, :e, :f, :g, :h)");
-                              $createAnimal->execute([
-                                   'b' => $dure,
-                                   'c' => $anam, 'd' => $diag,
-                                   'e' => $mani, 'f' => $suiv,
-                                   'g' => $idAnimal,
-                                   'h' => $idTARRRRRRRRRRRRRIF,
-                                   'i' => $_SESSION['id']
-                              ]);
-
-                              $_SESSION['choixAnimalConsult'] = "-1";
-                         ?>
-                              <meta http-equiv="refresh" content="0">
-                         <?php
-
+                              if ($searchTarif->rowCount() == 0) {
+                                   echo 'Ce tarif n\'existe pas avec ces paramètres';
+                              } else {
+                                   $resu = $searchTarif->fetch();
+                                   $idTarif = $resu['idTarif'];
+                                   $createAnimal = $db->prepare("INSERT INTO consultation VALUES(DEFAULT, DEFAULT, :b, :c, :d, :e, :f, :g, :h, :i)");
+                                   $createAnimal->execute([
+                                        'b' => $dure,
+                                        'c' => $anam, 'd' => $diag,
+                                        'e' => $mani, 'f' => $suiv,
+                                        'g' => $_SESSION['choixAnimalConsult'],
+                                        'h' => $idTarif,
+                                        'i' => $a
+                                   ]);
+                              }
                          }
                          ?>
                </div>
                <br>
 
                <?php
-
                include './includes/add-traitement.php';
-
                ?>
-
-
                <br>
 
                <h3 align="center"> Consultations </h3>
@@ -268,39 +291,39 @@ session_start(); // On démarre la session AVANT toute chose
                     <table id="employee_data" class="table table-striped table-bordered">
                          <thead>
                               <tr>
-                                   <th>Nom</th>
-                                   <th>Espèce</th>
-                                   <th>Race</th>
-                                   <th>Taille</th>
-                                   <th>Poids</th>
-                                   <th>Sexe</th>
-                                   <th>Castration</th>
+                                   <th>Date</th>
+                                   <th>Durée</th>
+                                   <th>Animal</th>
                                    <th>Propriétaire</th>
+                                   <th>Prix</th>
                                    <th>Action</th>
 
                               </tr>
                          </thead>
                          <?php
-                         /*
-                         while ($x = $tableAnimal->fetch()) {
-                              $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
-                              $c = ($x['castration'] == "o") ? 'oui' : 'non';
+                         $a = $_SESSION['id'];
+                         $allConsultations = $db->query("SELECT * FROM `consultation` c 
+                                                       JOIN animal 
+                                                       JOIN tarif 
+                                                       JOIN nom_proprio 
+                                                       WHERE animal.idAnimal = c.idAnimal 
+                                                            AND tarif.idTarif = c.idTarif 
+                                                            AND animal.idProprietaire = nom_proprio.idProprietaire 
+                                                            AND c.osteo_id=$a");
 
-                              echo "<tr><td>" . $x['nomAnimal'] .
-                                   "</td><td>" . $x['espece'] .
-                                   "</td><td>" . $x['race'] .
-                                   "</td><td>" . $x['taille'] . ' cm' .
-                                   "</td><td>" . $x['poids'] . ' kg' .
-                                   "</td><td>" . $s .
-                                   "</td><td>" . $c .
+                         while ($x = $allConsultations->fetch()) {
+                              echo "<tr><td>" . $x['date'] .
+                                   "</td><td>" . $x['dureeConsultation'] .
+                                   "</td><td>" . $x['nomAnimal'] .
                                    "</td><td>" . $x['nom'] . ' ' . $x['prenom'] .
-                                   "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
-                                                            <input type="hidden" name="idProp" value="' . $x['idProprietaire'] . '" >
-                                                            <input type="submit" name="majAnimal" value="modifier">
-                                                            <input type="submit" name="delAnimal" value="supprimer">
+                                   "</td><td>" . $x['prix'] . ' €' .
+                                   "</td><td>" . ' ' . '<form method="post" action="?">
+                                                            <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
+                                                            <input type="submit" name="detail" value="Voir en détail">
+                                                            <input type="submit" name="delConsultation" value="supprimer">
                                                        </form>' .
                                    "</td></tr>";
-                         }*/
+                         }
                          ?>
                     </table>
                </div>

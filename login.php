@@ -63,7 +63,7 @@ session_start(); // On démarre la session AVANT toute chose
                 $_SESSION['id'] = $result['osteo_id'];
                 $_SESSION['showContentProprio'] = "none";
                 $_SESSION['choixAnimalConsult'] = "-1";
-                $_SESSION['showBaseGenMedicament'] = "none";
+                $_SESSION['showTypeAndPlace'] = "none";
 
                 echo '<meta http-equiv="refresh" content="1;URL=./index.php">';
               } else {
