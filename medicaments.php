@@ -141,24 +141,21 @@ session_start(); // On démarre la session AVANT toute chose
                             $c = $_POST['dilution'];
                         }
 
-                        if (htmlspecialchars($_POST['nomMedic'])) {
-                            echo 'Les caractères spéciaux ne sont pas autorisés';
-                        } else {
-                            $doubleAnimal = $db->prepare("SELECT * FROM medicament WHERE nomMedicament=:nom AND osteo_id= :osteoId");
-                            $doubleAnimal->execute(['nom' => $_POST['nom'], 'osteoId' => $_SESSION['id']]);
 
-                            if ($doubleAnimal->rowCount() >= 1) { # verification dans la base unique de l'osteo
-                                echo 'Vous avez déjà enregistré ce médicament';
-                            } else {
-                                $createAnimal = $db->prepare("INSERT INTO medicament VALUES(DEFAULT, :a, :b, :c, :d)");
-                                $createAnimal->execute([
-                                    'a' => $_POST['nom'], 'b' => $_POST['conditionnement'],
-                                    'c' => $_POST['dilution'], 'd' => $_SESSION['id'],
-                                ]);
+                        $doubleAnimal = $db->prepare("SELECT * FROM medicament WHERE nomMedicament=:nom AND osteo_id= :osteoId");
+                        $doubleAnimal->execute(['nom' => $_POST['nomMedic'], 'osteoId' => $_SESSION['id']]);
+
+                        if ($doubleAnimal->rowCount() >= 1) { # verification dans la base unique de l'osteo
+                            echo 'Vous avez déjà enregistré ce médicament';
+                        } else {
+                            $createAnimal = $db->prepare("INSERT INTO medicament VALUES(DEFAULT, :a, :b, :c, :d)");
+                            $createAnimal->execute([
+                                'a' => $_POST['nomMedic'], 'b' => $_POST['conditionnement'],
+                                'c' => $_POST['dilution'], 'd' => $_SESSION['id'],
+                            ]);
                     ?>
-                                <meta http-equiv="refresh" content="0">
+                            <meta http-equiv="refresh" content="0">
                     <?php
-                            }
                         }
                     }
                     ?>

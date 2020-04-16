@@ -175,8 +175,7 @@ session_start(); // On démarre la session AVANT toute chose
                <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
                     <center>
                          <br>
-                         Ajouter un animal
-                         <br>
+                         Ajouter une consultation
                          <br>
                          <form method="post" action="?">
                               <br> Durée:
@@ -207,10 +206,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    ?>
                               </select>
                               sec
-
                               <br>
-                              <input type="text" name="taille" placeholder="Taille (22.55)" required><br>
-                              <input type="text" name="poids" placeholder="Poids (2.55)" required><br>
                               <p>Anamnese</p>
                               <textarea id="story" name="anamnese" rows="3" cols="80"></textarea>
                               <br>
@@ -220,65 +216,7 @@ session_start(); // On démarre la session AVANT toute chose
                               <p>Manipulations</p>
                               <textarea id="story" name="manip" rows="3" cols="80"></textarea>
                               <br>
-                              <select name="suivi">
-                                   <option value="" selected> non </option>
-                              </select>
-                              <input type="submit" name="subAn" value="Ajouter">
-                              <input type="reset" value="Effacer" onAction=>
-                              <br>
-                              <br>
-                         </form>
-                         <?php
-                         if (isset($_POST['subAn'])) {
-                              extract($_POST);
-                              if (
-                                   containsSpecialChars($nom) || containsSpecialChars($espece) ||
-                                   containsSpecialChars($race) || containsSpecialChars($taille) ||
-                                   containsSpecialChars($poids)
-                              ) {
-                                   echo 'Les caractères spéciaux ne sont pas autorisés';
-                              } elseif (containsNumber($race) || containsNumber($espece)) {
-                                   echo 'La race ou l\'espèce ne peuvent contenir des nombres';
-                              } elseif (!is_numeric($taille) || !is_numeric($poids)) {
-                                   echo 'Le poids et la taille doivent être un nombre entier ou réel';
-                              } else {
-                                   $doubleAnimal = $db->prepare("SELECT * FROM animal WHERE nomAnimal= :nom AND espece= :espece AND race= :race AND idProprietaire= :proprioId AND osteo_id= :osteoId");
-                                   $doubleAnimal->execute(['nom' => $nom, 'espece' => $espece, 'race' => $race, 'proprioId' => $idproprio, 'osteoId' => $_SESSION['id']]);
-                                   $result = $doubleAnimal->rowCount();
-                                   if ($result >= 1) { # verification dans la base unique de l'osteo
-                                        echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
-                                   } else {
-                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j)");
-                                        $createAnimal->execute([
-                                             'a' => $nom, 'b' => $espece,
-                                             'c' => $race, 'd' => $taille,
-                                             'e' => $poids, 'f' => $sexe,
-                                             'g' => $castration, 'h' => $anamnese,
-                                             'i' => $idproprio, 'j' => $_SESSION['id']
-                                        ]);
-                         ?>
-                                        <meta http-equiv="refresh" content="0">
-                         <?php
-                                   }
-                              }
-                         }
-                         ?>
-
-               </div>
-
-               <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
-                    <center>
-                         <br>
-                         Associer un traitement
-                         <br>
-                         <br>
-                         <form method="post" action="?">
-                              <br>
-                              <input type="text" name="produit" placeholder="Produit"><br>
-                              <input type="text" name="frequence" placeholder="Fréquence"><br>
-                              <input type="text" name="dose" placeholder="Dose"><br>
-                              <input type="text" name="dureeTraitement" placeholder="Durée du Traitement"><br>
-
+                              <input type="text" name="suivi" placeholder="Suivi"><br>
 
                               <input type="submit" name="subAn" value="Ajouter">
                               <input type="reset" value="Effacer" onAction=>
@@ -287,41 +225,41 @@ session_start(); // On démarre la session AVANT toute chose
                          </form>
                          <?php
                          if (isset($_POST['subAn'])) {
-                              extract($_POST);
-                              if (
-                                   containsSpecialChars($nom) || containsSpecialChars($espece) ||
-                                   containsSpecialChars($race) || containsSpecialChars($taille) ||
-                                   containsSpecialChars($poids)
-                              ) {
-                                   echo 'Les caractères spéciaux ne sont pas autorisés';
-                              } elseif (containsNumber($race) || containsNumber($espece)) {
-                                   echo 'La race ou l\'espèce ne peuvent contenir des nombres';
-                              } elseif (!is_numeric($taille) || !is_numeric($poids)) {
-                                   echo 'Le poids et la taille doivent être un nombre entier ou réel';
-                              } else {
-                                   $doubleAnimal = $db->prepare("SELECT * FROM animal WHERE nomAnimal= :nom AND espece= :espece AND race= :race AND idProprietaire= :proprioId AND osteo_id= :osteoId");
-                                   $doubleAnimal->execute(['nom' => $nom, 'espece' => $espece, 'race' => $race, 'proprioId' => $idproprio, 'osteoId' => $_SESSION['id']]);
-                                   $result = $doubleAnimal->rowCount();
-                                   if ($result >= 1) { # verification dans la base unique de l'osteo
-                                        echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
-                                   } else {
-                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j)");
-                                        $createAnimal->execute([
-                                             'a' => $nom, 'b' => $espece,
-                                             'c' => $race, 'd' => $taille,
-                                             'e' => $poids, 'f' => $sexe,
-                                             'g' => $castration, 'h' => $anamnese,
-                                             'i' => $idproprio, 'j' => $_SESSION['id']
-                                        ]);
+                              $anam = (isset($_POST['anamnese'])) ? $_POST['anamnese'] : "-";
+                              $diag = (isset($_POST['diagnostic'])) ? $_POST['diagnostic'] : "-";
+                              $mani = (isset($_POST['manip'])) ? $_POST['manip'] : "-";
+                              $suiv = (isset($_POST['suivi'])) ? $_POST['suivi'] : "-";
+                              $dure = $_POST['heure'] . ':' . $_POST['min'] . ':' . $_POST['sec'];
+
+
+
+                              $createAnimal = $db->prepare("INSERT INTO consultation VALUES(DEFAULT, DEFAULT, :b, :c, :d, :e, :f, :g, :h)");
+                              $createAnimal->execute([
+                                   'b' => $dure,
+                                   'c' => $anam, 'd' => $diag,
+                                   'e' => $mani, 'f' => $suiv,
+                                   'g' => $idAnimal,
+                                   'h' => $idTARRRRRRRRRRRRRIF,
+                                   'i' => $_SESSION['id']
+                              ]);
+
+                              $_SESSION['choixAnimalConsult'] = "-1";
                          ?>
-                                        <meta http-equiv="refresh" content="0">
+                              <meta http-equiv="refresh" content="0">
                          <?php
-                                   }
-                              }
+
                          }
                          ?>
-
                </div>
+               <br>
+
+               <?php
+
+               include './includes/add-traitement.php';
+
+               ?>
+
+
                <br>
 
                <h3 align="center"> Consultations </h3>

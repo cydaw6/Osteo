@@ -176,12 +176,18 @@
           </a>
           <!-- <input class="subm" type="submit" name="proprietaires" value="Propriétaires">
                 -->
-
-
         </li>
         <li>
           <div class="icons"><a href="./medicaments.php"><i class="fa fa-medkit"></i></a></div><a href="./medicaments.php">
             <div class="linktitle">Médicaments</div></i>
+          </a>
+          <div class="linktitle">
+
+
+        </li>
+        <li>
+          <div class="icons"><a href="./tarif.php"><i class="fa fa-usd" aria-hidden="true"></i></a></div><a href="./tarif.php">
+            <div class="linktitle">Tarifs</div></i>
           </a>
           <div class="linktitle">
 
