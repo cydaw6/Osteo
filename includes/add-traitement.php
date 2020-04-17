@@ -1,7 +1,7 @@
 <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
     <center>
         <br>
-        Associer un traitement pour la dernière consultation ajouté
+        Associer un traitement à la dernière consultation ajouté
 
         <form method="post" action="?">
             <select name="idMedicament">
@@ -37,8 +37,8 @@
             } else {
                 $createAnimal = $db->prepare("INSERT INTO traitement VALUES(:a, :b, :c, :d, :e, :f, :g)");
                 $createAnimal->execute([
-                    'a' => $_POST['idMedicament'], 'b' => $_SESSION['idLastConsultation'], // lastId : id de la dernière consultation ajouté, lastIdAnimal pareil, à définir dans la page qui fait l'include
-                    'c' => $_SESSION['idLastAnimalConsultation'], 'd' => $_POST['produit'],
+                    'a' => $_POST['idMedicament'], 'b' => $idLastConsultation, // lastId : id de la dernière consultation ajouté, lastIdAnimal pareil, à définir dans la page qui fait l'include
+                    'c' => $idLastAnimal, 'd' => $_POST['produit'],
                     'e' => $_POST['frequence'], 'f' => $_POST['dose'],
                     'g' => $_POST['dureeTraitement']
                 ]);

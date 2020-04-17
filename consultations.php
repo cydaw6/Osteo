@@ -255,8 +255,6 @@ session_start(); // On démarre la session AVANT toute chose
                               $suiv = (isset($_POST['suivi'])) ? $_POST['suivi'] : "-";
                               $dure = $_POST['heure'] . ':' . $_POST['min'] . ':' . $_POST['sec'];
                               $a = $_SESSION['id'];
-                              //echo $anam . ' ' . $diag . ' ' . $mani . ' ' . $suiv . ' ' . $dure . ' ' . $_POST['lieuConsult'] . ' ' . $_POST['typeConsult'] . ' ' . $_SESSION['choixAnimalConsult'];
-
 
                               $searchTarif = $db->prepare("SELECT idTarif FROM tarif WHERE osteo_id=:a AND lieuConsultation=:b AND typeConsultation=:c");
                               $searchTarif->execute(['a' => $a, 'b' => $_POST['lieuConsult'], 'c' => $_POST['typeConsult']]);
@@ -276,14 +274,8 @@ session_start(); // On démarre la session AVANT toute chose
                                         'h' => $idTarif,
                                         'i' => $a
                                    ]);
-                                   $r = $db->query("SELECT idConsultation FROM consultation WHERE idConsultation=LAST_INSERT_ID()");
                                    /* On valide les modifications */
                                    $db->commit();
-
-                                   $x = $r->fetch();
-                                   $_SESSION['idLastConsultation'] = $x['idConsultation'];
-                                   echo '<h2>' . $x['idConsultation'] . '</h2>';
-                                   $_SESSION['idLastAnimalConsultation'] = $_SESSION['choixAnimalConsult'];
                               }
                          }
                          ?>
@@ -291,6 +283,10 @@ session_start(); // On démarre la session AVANT toute chose
                <br>
 
                <?php
+               $r = $db->query("SELECT idConsultation, idAnimal FROM `consultation` WHERE osteo_id=1 ORDER BY idConsultation DESC LIMIT 0, 1");
+               $x = $r->fetch();
+               $idLastConsultation = $x['idConsultation'];
+               $idLastAnimal = $x['idAnimal'];
                include './includes/add-traitement.php';
                ?>
                <br>
@@ -331,9 +327,13 @@ session_start(); // On démarre la session AVANT toute chose
                                    "</td><td>" . $x['prix'] . ' €' .
                                    "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
-                                                            <input type="submit" name="detail" value="Voir en détail">
                                                             <input type="submit" name="delConsultation" value="supprimer">
-                                                       </form>' .
+                                                       </form>
+
+                                                       <form method="post" action="./consultation-detail.php" target="_blank">
+                                                       <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
+                                                       <input type="submit" name="detailConsultation" value="Voir en détail">
+                                                       </form> ' .
                                    "</td></tr>";
                          }
 
