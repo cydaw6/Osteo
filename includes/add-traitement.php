@@ -1,7 +1,7 @@
 <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
     <center>
         <br>
-        Associer un traitement
+        Associer un traitement pour la dernière consultation ajouté
 
         <form method="post" action="?">
             <select name="idMedicament">
@@ -22,33 +22,27 @@
             <input type="text" name="dureeTraitement" placeholder="Durée du Traitement"><br>
 
 
-            <input type="submit" name="subAn" value="Ajouter">
+            <input type="submit" name="subTraitement" value="Ajouter">
             <input type="reset" value="Effacer" onAction=>
             <br>
             <br>
         </form>
         <?php
-        if (isset($_POST['subAn'])) {
-            extract($_POST);
-
-
-            if ($result >= 1) { # verification dans la base unique de l'osteo
-                echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
+        if (isset($_POST['subTraitement'])) {
+            $b = $_SESSION['idLastConsultation'];
+            $c = $_POST['idMedicament'];
+            $verif = $db->query("SELECT * FROM traitement WHERE idConsultation=$b AND idMedicament=$c");
+            if ($verif->rowCount() >= 1) { # verification dans la base unique de l'osteo
+                echo 'Vous avez déjà associer un traitement avec ce médicament';
             } else {
-                $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j)");
+                $createAnimal = $db->prepare("INSERT INTO traitement VALUES(:a, :b, :c, :d, :e, :f, :g)");
                 $createAnimal->execute([
-                    'a' => $nom, 'b' => $espece,
-                    'c' => $race, 'd' => $taille,
-                    'e' => $poids, 'f' => $sexe,
-                    'g' => $castration, 'h' => $anamnese,
-                    'i' => $idproprio, 'j' => $_SESSION['id']
+                    'a' => $_POST['idMedicament'], 'b' => $_SESSION['idLastConsultation'], // lastId : id de la dernière consultation ajouté, lastIdAnimal pareil, à définir dans la page qui fait l'include
+                    'c' => $_SESSION['idLastAnimalConsultation'], 'd' => $_POST['produit'],
+                    'e' => $_POST['frequence'], 'f' => $_POST['dose'],
+                    'g' => $_POST['dureeTraitement']
                 ]);
             }
-        ?>
-            <meta http-equiv="refresh" content="0">
-        <?php
-
-
         }
         ?>
 

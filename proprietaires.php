@@ -131,7 +131,7 @@ session_start(); // On démarre la session AVANT toute chose
                          <select name="printChoice" onchange="this.form.submit()">
                               <option value="Affichage">Affichage</option>
                               <option value="Proprio">Particuliers</option>
-                              <option value="Orga">Organisations</option>
+                              <option value="Orga">Organismes</option>
                               <option hidden> --- -- --- -----ooooooooooooooooooooooooooooooooo o o o o o o o o oo o o-- ---- --- ----- -- -- - </option>
                          </select>
                          <input type="submit" name="print" hidden>
@@ -208,7 +208,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                   $db->query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
                                                   $result = $db->query("SELECT idProprietaire FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
                                                   $id = $result->fetch();
-                                                  echo $id['idProprietaire'];
+
                                                   /* On valide les modifications */
                                                   $db->commit();
 

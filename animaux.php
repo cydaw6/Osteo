@@ -47,10 +47,12 @@ session_start(); // On démarre la session AVANT toute chose
           include './includes/right-navbar.php';
           include './includes/database.php'; // Connexion à la bdd
           $idosteo = $_SESSION['id'];
-          $tableAnimal = $db->query("SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, raisonSociale prenom, typeOrga nom FROM `animal` NATURAL JOIN organisme
-                                   UNION
-                                   SELECT idAnimal, idProprietaire, nomAnimal, espece, race, taille, poids, sexe, castration, Anamnese, prenomPa, nomPa FROM animal NATURAL JOIN particulier 
-                                   ");
+          /*
+          $tableAnimal = $db->query("CREATE VIEW nom_proprio AS
+SELECT idProprietaire, raisonSociale prenom, typeOrga nom, osteo_id FROM proprietaire NATURAL JOIN organisme NATURAL JOIN possede_proprio
+UNION
+SELECT idProprietaire, prenomPa, nomPa, osteo_id FROM proprietaire NATURAL JOIN particulier NATURAL JOIN possede_proprio 
+                                   ");*/
 
 
           function containsSpecialChars($str)
@@ -81,8 +83,8 @@ session_start(); // On démarre la session AVANT toute chose
 
                <?php
                // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
-               $allProprio = $db->query("SELECT * FROM nom_proprio ORDER BY nom");
                $a = $_SESSION['id'];
+               $allProprio = $db->query("SELECT * FROM nom_proprio WHERE osteo_id=$a ORDER BY nom");
                $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
                ?>
                <br>
@@ -184,7 +186,7 @@ session_start(); // On démarre la session AVANT toute chose
                               </tr>
                          </thead>
                          <?php
-                         while ($x = $tableAnimal->fetch()) {
+                         while ($x = $allAnimaux->fetch()) {
                               $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
                               $c = ($x['castration'] == "o") ? 'oui' : 'non';
 

@@ -107,11 +107,12 @@ session_start(); // On démarre la session AVANT toute chose
                <br>
                <br>
                <form method="post" action="?" style="position:relative;">
+                    Choisir un animal pour la consultation
                     <select name="choiceAnimal" onchange="this.form.submit()">
                          <option>Animal</option>
                          <?php
                          while ($t = $allAnimals->fetch()) {
-                              echo '<option value="' . $t['idAnimal'] . '">' . $t['nomAnimal'] . ' | ' . $t['nom'] . ' - ' . $t['prenom'] . '</option>';
+                              echo '<option value="' . $t['idAnimal'] . '">' . $t['nomAnimal'] . ' | ' . $t['nom'] . '  ' . $t['prenom'] . '</option>';
                          }
                          ?>
                          <option hidden> --- -- --- -----ooooooooooooooooooooooooooooooooo o o o o o o o o oo o o-- ---- --- ----- -- -- - </option>
@@ -265,6 +266,7 @@ session_start(); // On démarre la session AVANT toute chose
                               } else {
                                    $resu = $searchTarif->fetch();
                                    $idTarif = $resu['idTarif'];
+                                   $db->beginTransaction();
                                    $createAnimal = $db->prepare("INSERT INTO consultation VALUES(DEFAULT, DEFAULT, :b, :c, :d, :e, :f, :g, :h, :i)");
                                    $createAnimal->execute([
                                         'b' => $dure,
@@ -274,6 +276,14 @@ session_start(); // On démarre la session AVANT toute chose
                                         'h' => $idTarif,
                                         'i' => $a
                                    ]);
+                                   $r = $db->query("SELECT idConsultation FROM consultation WHERE idConsultation=LAST_INSERT_ID()");
+                                   /* On valide les modifications */
+                                   $db->commit();
+
+                                   $x = $r->fetch();
+                                   $_SESSION['idLastConsultation'] = $x['idConsultation'];
+                                   echo '<h2>' . $x['idConsultation'] . '</h2>';
+                                   $_SESSION['idLastAnimalConsultation'] = $_SESSION['choixAnimalConsult'];
                               }
                          }
                          ?>
@@ -295,6 +305,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    <th>Durée</th>
                                    <th>Animal</th>
                                    <th>Propriétaire</th>
+                                   <th>Manipulations</th>
                                    <th>Prix</th>
                                    <th>Action</th>
 
@@ -316,6 +327,7 @@ session_start(); // On démarre la session AVANT toute chose
                                    "</td><td>" . $x['dureeConsultation'] .
                                    "</td><td>" . $x['nomAnimal'] .
                                    "</td><td>" . $x['nom'] . ' ' . $x['prenom'] .
+                                   "</td><td>" . $x['resumManip'] .
                                    "</td><td>" . $x['prix'] . ' €' .
                                    "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
@@ -324,6 +336,17 @@ session_start(); // On démarre la session AVANT toute chose
                                                        </form>' .
                                    "</td></tr>";
                          }
+
+                         if (isset($_POST['delConsultation'])) {
+                              $a = $_POST['idConsultation'];
+                              $b = $_SESSION['id'];
+                              $db->query("DELETE FROM consultation WHERE idConsultation = $a AND osteo_id=$b ");
+                         ?>
+                              <meta http-equiv="refresh" content="0">
+                         <?php
+                         }
+
+
                          ?>
                     </table>
                </div>

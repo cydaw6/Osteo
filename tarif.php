@@ -137,10 +137,10 @@ session_start(); // On démarre la session AVANT toute chose
                     <?php
                     /* AJOUT DE LIEU OU TYPE DE CONSULT*/
                     if (isset($_POST['subLieu'])) {
-                        $prep = $db->prepare("INSERT INTO lieu_consultation VALUES(:a, :b)");
+                        $prep = $db->prepare("INSERT INTO lieu_consultation VALUES(DEFAULT, :a, :b)");
                         $prep->execute(['a' => $_POST['addLieu'], 'b' => $_SESSION['id']]);
                     } elseif (isset($_POST['subType'])) {
-                        $prep = $db->prepare("INSERT INTO type_consultation VALUES(:a, :b)");
+                        $prep = $db->prepare("INSERT INTO type_consultation VALUES(DEFAULT, :a, :b)");
                         $prep->execute(['a' => $_POST['addType'], 'b' => $_SESSION['id']]);
                     }
 
@@ -166,14 +166,14 @@ session_start(); // On démarre la session AVANT toute chose
                                 echo '<tr>
                                  <td>' . $t['lieuConsultation'] .
                                     '</td><td><form method="post" action="?">
-                                            <input type="hidden" name="idLieu" value="' . $t['lieuConsultation'] . '" >
+                                            <input type="hidden" name="idLieu" value="' . $t['id_lieu'] . '" >
                                             <input type="submit" name="delLieu" value="supprimer">
                                  </form>
                                 </td></tr></table>';
                             }
                         }
                         if (isset($_POST['delLieu'])) {
-                            $prep = $db->prepare("DELETE FROM lieu_consultation WHERE lieuConsultation=:c AND osteo_id=:d");
+                            $prep = $db->prepare("DELETE FROM lieu_consultation WHERE id_lieu=:c AND osteo_id=:d");
                             $prep->execute(['c' => $_POST['idLieu'], 'd' => $_SESSION['id']]);
 
                         ?>
@@ -193,7 +193,7 @@ session_start(); // On démarre la session AVANT toute chose
                                 echo '<tr>
                                  <td>' . $x['typeConsultation'] .
                                     '</td><td><form method="post" action="?">
-                                            <input type="hidden" name="idType" value="' . $x['typeConsultation'] . '" >
+                                            <input type="hidden" name="idType" value="' . $x['id_type'] . '" >
                                             <input type="submit" name="delType" value="supprimer">
                                  </form>
                                 </td></tr></table>';
@@ -201,7 +201,7 @@ session_start(); // On démarre la session AVANT toute chose
                         }
 
                         if (isset($_POST['delType'])) {
-                            $prep = $db->prepare("DELETE FROM type_consultation WHERE typeConsultation=$c AND osteo_id=$d");
+                            $prep = $db->prepare("DELETE FROM type_consultation WHERE id_type=$c AND osteo_id=$d");
                             $prep->execute(['c' => $_POST['idType'], 'd' => $_SESSION['id']]);
                         ?>
                             <meta http-equiv="refresh" content="0">
