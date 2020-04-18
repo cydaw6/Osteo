@@ -357,8 +357,6 @@ session_start(); // On démarre la session AVANT toute chose
                                                   addParticulier($db);
                                              }
                                         }
-                                   } else if (isset($_POST['subOrga'])) {
-                                        // faire ici les organisations
                                    }
 
                                    ?>
@@ -399,12 +397,11 @@ session_start(); // On démarre la session AVANT toute chose
                                              "</td><td>" . $t['localite'] .
                                              "</td><td>" . $t['codePostal'] .
                                              "</td><td>" . ' ' . '<form method="post" action="?">
-                                                                                               <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
-                                                                                               <input type="submit" name="seeAnimals" value="animaux">
-                                                                                               <input type="submit" name="majProp" value="modifier">
-                                                                                               <input type="submit" name="delProp" value="supprimer">
-                                                                                               </form>
-                                                                                               ' .
+                                                                      <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
+                                                                      <input type="submit" name="seeAnimals" value="animaux">
+                                                                      <input type="submit" name="delProp" value="supprimer">
+                                                                 </form>
+                                                                 ' .
                                              "</td></tr>";
                                    }
 
