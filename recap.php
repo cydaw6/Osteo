@@ -41,79 +41,90 @@ session_start(); // On démarre la session AVANT toute chose
 </head>
 
 <body>
-
-    <div style="height: 158px;max-width: 100%;position: relative;z-index: 3;">
-
-        <?php
-        include './includes/button-to-top.php';
-        include './includes/header.php';
-        include './includes/right-navbar.php';
-        include './includes/database.php'; // Connexion à la bdd
-        ?>
-    </div>
-    <br /><br />
-
-    <div style="padding-left: 170px; margin-right: 0px; margin-left: 0px; background-color:white; max-width: 100%;">
-        <div class="container" style="background-color: white; max-width: 1060px; min-width: 100px!important;">
-            <br>
-            <br>
-            <br>
+    <?php
+    if (!isset($_SESSION['id'])) {
+        echo '<h4>Vous n\'avez pas accès à cette page. Redirection...</h4>';
+        echo '<meta http-equiv="refresh" content="1; URL=./index.php" />';
+    } else {
+    ?>
+        <div style="height: 158px;max-width: 100%;position: relative;z-index: 3;">
 
             <?php
-            // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
-            $a = $_SESSION['id'];
-            $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
+            include './includes/button-to-top.php';
+            include './includes/header.php';
+            include './includes/right-navbar.php';
+            include './includes/database.php'; // Connexion à la bdd
             ?>
-            <br>
-            <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
-                <div id="infoBase" style="margin-left:130px;">
+        </div>
+        <br /><br />
 
-                    <?php
-                    $q = $db->query("SELECT COUNT(*) nbAnimaux FROM animal WHERE osteo_id=$a");
-                    $r = $q->fetch();
-                    echo '<p>Nombre d\'animaux enregistrés : ' . $r['nbAnimaux'] . '</p>';
+        <div style="padding-left: 170px; margin-right: 0px; margin-left: 0px; background-color:white; max-width: 100%;">
+            <div class="container" style="background-color: white; max-width: 1060px; min-width: 100px!important;">
+                <br>
+                <br>
+                <br>
 
-                    $q = $db->query("SELECT COUNT(*) nbParticuliers FROM particulier NATURAL JOIN possede_proprio WHERE osteo_id=$a");
-                    $r = $q->fetch();
-                    echo '<p>Nombre de particuliers enregistrés : ' . $r['nbParticuliers'] . '</p>';
+                <?php
+                // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
+                $a = $_SESSION['id'];
+                $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
+                ?>
+                <br>
+                <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                    <center>
+                        <h3>Synthèse de vos données</h3><br>
 
-                    $q = $db->query("SELECT COUNT(*) nbOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
-                    $r = $q->fetch();
-                    echo '<p>Nombre d\'organismes enregistrés : ' . $r['nbOrga'] . '</p>';
+                    </center>
+                    <div id="infoBase" style="margin-left:130px;">
 
-                    $q = $db->query("SELECT ROUND(AVG(prix),2) prixM FROM consultation NATURAL JOIN tarif WHERE osteo_id=$a");
-                    $r = $q->fetch();
-                    echo '<p>Prix moyen d\'une consultation : ' . $r['prixM'] . '€</p>';
+                        <?php
+                        $q = $db->query("SELECT COUNT(*) nbAnimaux FROM animal WHERE osteo_id=$a");
+                        $r = $q->fetch();
+                        echo '<p>Nombre d\'animaux enregistrés : ' . $r['nbAnimaux'] . '</p>';
 
-                    $q = $db->query("SELECT COUNT(*) tt FROM consultation WHERE osteo_id=$a");
-                    $r = $q->fetch();
-                    echo '<p>Total de consultations réalisées: ' . $r['tt'] . '</p>';
+                        $q = $db->query("SELECT COUNT(*) nbParticuliers FROM particulier NATURAL JOIN possede_proprio WHERE osteo_id=$a");
+                        $r = $q->fetch();
+                        echo '<p>Nombre de particuliers enregistrés : ' . $r['nbParticuliers'] . '</p>';
 
-                    ?>
+                        $q = $db->query("SELECT COUNT(*) nbOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
+                        $r = $q->fetch();
+                        echo '<p>Nombre d\'organismes enregistrés : ' . $r['nbOrga'] . '</p>';
+
+                        $q = $db->query("SELECT ROUND(AVG(prix),2) prixM FROM consultation NATURAL JOIN tarif WHERE osteo_id=$a");
+                        $r = $q->fetch();
+                        echo '<p>Prix moyen d\'une consultation : ' . $r['prixM'] . '€</p>';
+
+                        $q = $db->query("SELECT COUNT(*) tt FROM consultation WHERE osteo_id=$a");
+                        $r = $q->fetch();
+                        echo '<p>Total de consultations réalisées: ' . $r['tt'] . '</p>';
+
+                        ?>
+
+                    </div>
+                    <center>
+
+                        <div class="container-fluid">
+                            <div id="columnchart12" style="width: 100%; height: 250px;"></div>
+                        </div>
+                        <div class="container-fluid">
+                            <div id="columnchart13" style="width: 100%; height: 250px;"></div>
+                        </div>
+
+                        <body>
+                            <div id="chart_div" style="width: 100%; height: 500px;"></div>
+                        </body>
 
                 </div>
-                <center>
-
-                    <div class="container-fluid">
-                        <div id="columnchart12" style="width: 100%; height: 250px;"></div>
-                    </div>
-                    <div class="container-fluid">
-                        <div id="columnchart13" style="width: 100%; height: 250px;"></div>
-                    </div>
-
-                    <body>
-                        <div id="chart_div" style="width: 100%; height: 500px;"></div>
-                    </body>
-
-            </div>
-            <br>
-            <div id="bottom-bar">
-                <!-- logo univ-->
-                <p></p>
+                <br>
+                <div id="bottom-bar">
+                    <!-- logo univ-->
+                    <p></p>
+                </div>
             </div>
         </div>
-    </div>
-
+    <?php
+    }
+    ?>
 </body>
 
 </html>

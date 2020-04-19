@@ -56,7 +56,10 @@ session_start(); // On démarre la session AVANT toute chose
               $hashpass = $result['password'];
 
               if (password_verify($password, $hashpass)) {
+
                 echo "Connexion réussie. Redirection...";
+
+                include './includes/loading.php';
                 $_SESSION['username'] = $result['username'];
                 $_SESSION['date'] = $result['date'];
                 $_SESSION['email'] = $result['email'];
@@ -65,7 +68,7 @@ session_start(); // On démarre la session AVANT toute chose
                 $_SESSION['choixAnimalConsult'] = "-1";
                 $_SESSION['showTypeAndPlace'] = "none";
 
-                echo '<meta http-equiv="refresh" content="1;URL=./index.php">';
+                echo '<meta http-equiv="refresh" content="2;URL=./index.php">';
               } else {
                 echo '<p style="color: red;">L\'email ou le mot de passe est incorrect</p>';
               }

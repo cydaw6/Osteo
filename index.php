@@ -55,16 +55,16 @@ session_start(); // On démarre la session AVANT toute chose
 
 
     </div>
-
-    <div style="margin-left:25%;max-width: 932px;margin-top:-398px;z-index: 1;">
-
-
-      <article style="background: white;">
+    <center>
+      <div style="max-width: 932px;margin-top:-398px;z-index: 1;">
 
 
+        <article style="background: white;">
 
 
-        <center>
+
+
+
           <?php
           if (isset($_POST['profil'])) {
             include './includes/submenus/profile.php';
@@ -73,26 +73,32 @@ session_start(); // On démarre la session AVANT toute chose
 
 
           if (isset($_SESSION['username']) && (isset($_SESSION['date']))) {
+            if (!isset($_POST['profil'])) {
+              echo '<h2>Fil d\'actualité</h2>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br>';
+            }
           } else {
-            echo '<h2>Inscrivez vous sur OSTEO</h2>
+            echo '<h2>OSTEO</h2>
                 		<div style="background-color: black; height: 2px;"></div>';
-            echo '<p> connectez vous </p>';
+            echo '<p>   </p>';
             echo  "<p>Inscrivez vous et diposez d'une interface simple pour gérer les données de vos consultations et de vos patients.</p>";
           }
           ?>
 
-        </center>
-      </article>
+
+        </article>
 
 
 
 
 
-    </div>
-    <div id="bottom-bar" style="margin-top: 500px;">
-      <!-- logo univ-->
-      <p></p>
-    </div>
+
+      </div>
+
+      <div id="bottom-bar" style="margin-top: 500px;">
+        <!-- logo univ-->
+        <p></p>
+      </div>
 
   </div>
   <!-- 932px; border: 3px black solid;-->

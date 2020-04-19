@@ -26,14 +26,18 @@
           </li>
         <?php
         }
+
+        if (!isset($_SESSION['id'])) {
+        ?>
+          <li>
+            <a href="./apropos.php">À propos</a>
+          </li>
+        <?php
+        }
         ?>
 
-        <li>
-          <a href="#!">A propos</a>
-        </li>
-        <li>
-          <a href="#!">Contact</a>
-        </li>
+
+
       </ul>
     </nav>
   </div>

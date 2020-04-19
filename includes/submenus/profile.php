@@ -71,8 +71,92 @@
 			</form>
 
 		</div>
+		<br>
+		<div style="margin-left: 1%;width: 40%; height: 50px; float: left; background: white;margin-right: 5px;">
+			<b>Remettre mon compte à zero</b>
+			<br>
+			<form method="post" action="?">
+				<input hidden name="profil">
+				<input type="submit" name="setAcountToZero">
+			</form>
+		</div>
+		<div style="margin-right: 1%; margin-left: 50%; height: 50px; background: white;">
+			<b> Supprimer mon compte</b>
+			<br>
+			<form method="post" action="?">
+				<input hidden name="profil">
+				<input type="submit" name="deleteAcount">
+			</form>
+		</div>
+		<br>
+
+		<?php
+		if (isset($_POST['setAcountToZero'])) {
+			echo '<div style="max-width: 100%;margin-right: 1%; margin-left: 1%; height: 100px; background: white ;">
+			
+			<form method="post" action="?">
+			Cette action est irréversible entrez EFFACERMESDONNEES pour confirmer:
+				<input type="text" name="inputConfirm" required>
+				<input hidden name="profil">
+				<input type="submit" name="confirmToZero">
+			</form>
+		</div>
+		';
+		}
+		if (isset($_POST['confirmToZero'])) {
+			if ($_POST['inputConfirm'] == "EFFACERMESDONNEES") {
+				$a = $_SESSION['id'];
+				$db->query("DELETE FROM possede_proprio WHERE osteo_id=$a");
+				$db->query("DELETE traitement FROM traitement JOIN animal a ON (traitement.idAnimal= a.idAnimal) WHERE a.osteo_id=$a");
+				$db->query("DELETE FROM consultation WHERE osteo_id=$a");
+				$db->query("DELETE FROM medicament WHERE osteo_id=$a");
+				$db->query("DELETE FROM lieu_consultation WHERE osteo_id=$a");
+				$db->query("DELETE FROM type_consultation WHERE osteo_id=$a");
+				$db->query("DELETE FROM tarif WHERE osteo_id=$a");
+				$db->query("DELETE FROM animal WHERE osteo_id=$a");
+				echo 'Vos données on bien été supprimé. Votre compte est comme neuf.';
+			} else {
+				echo 'Confirmation échoué.';
+			}
+		}
+		if (isset($_POST['deleteAcount'])) {
+			echo '<div style="max-width: 100%;margin-right: 1%; margin-left: 1%; height: 100px; background: white ;">
+			
+			<form method="post" action="?">
+			Cette action est irréversible entrez SUPPRIMERMONCOMPTE pour confirmer:
+				<input type="text" name="inputConfirm" required>
+				<input hidden name="profil">
+				<input type="submit" name="confirmDelete">
+			</form>
+		</div>
+		';
+		}
+		if (isset($_POST['confirmDelete'])) {
+			if ($_POST['inputConfirm'] == "SUPPRIMERMONCOMPTE") {
+				$a = $_SESSION['id'];
+				$db->query("DELETE FROM possede_proprio WHERE osteo_id=$a");
+				$db->query("DELETE traitement FROM traitement JOIN animal a ON (traitement.idAnimal= a.idAnimal) WHERE a.osteo_id=$a");
+				$db->query("DELETE FROM consultation WHERE osteo_id=$a");
+				$db->query("DELETE FROM medicament WHERE osteo_id=$a");
+				$db->query("DELETE FROM lieu_consultation WHERE osteo_id=$a");
+				$db->query("DELETE FROM type_consultation WHERE osteo_id=$a");
+				$db->query("DELETE FROM tarif WHERE osteo_id=$a");
+				$db->query("DELETE FROM animal WHERE osteo_id=$a");
+				$db->query("DELETE FROM users WHERE osteo_id=$a");
+				echo 'Vos données on été supprimé. Redirection...';
+				echo '<meta http-equiv="refresh" content="3; URL=./logout.php" />';
+			} else {
+				echo 'Confirmation échoué.';
+			}
+		}
+
+
+		?>
+
 	</div>
 	<br>
+
+
 
 	<?php
 

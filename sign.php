@@ -88,7 +88,8 @@
                   'email' => $secure_email,
                   'password' => $hashpass,
                 ]);
-                echo '<p style="color:black;">Inscription réussie</p>';
+                echo '<meta http-equiv="refresh" content="2;URL=./login.php">';
+                echo '<p style="color:black;">Inscription réussie.</p>';
               } elseif ($result != 0) {
                 echo "Cet email est déjà utilisé";
               } elseif ($result2 != 0) {

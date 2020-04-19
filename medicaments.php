@@ -71,144 +71,152 @@ session_start(); // On démarre la session AVANT toute chose
 
 <body>
 
-    <div style="height: 158px;max-width: 100%;position: relative;z-index: 3;">
-
-        <?php
-        include './includes/button-to-top.php';
-        include './includes/header.php';
-        include './includes/right-navbar.php';
-        include './includes/database.php'; // Connexion à la bdd
-        $a = $_SESSION['id'];
-        $allMedic = $db->query("SELECT idAnimal, nomAnimal, espece, nom, prenom FROM animal an NATURAL JOIN nom_proprio WHERE an.osteo_id=$a");
-
-        function containsSpecialChars($str)
-        {
-            if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬]/', $str)) {
-                return true;
-            }
-            return false;
-        }
-
-        function containsNumber($str)
-        {
-            if (preg_match('#[0-9]#', $str)) {
-                return true;
-            }
-            return false;
-        }
-
-        ?>
-    </div>
-    <br /><br />
-
-    <div style="padding-left: 170px; margin-right: 0px; margin-left: 0px; background-color:white; max-width: 100%;">
-
-        <div class="container" style="background-color: white; max-width: 1060px; min-width: 100px!important;">
+    <?php
+    if (!isset($_SESSION['id'])) {
+        echo '<h4>Vous n\'avez pas accès à cette page. Redirection...</h4>';
+        echo '<meta http-equiv="refresh" content="1; URL=./index.php" />';
+    } else {
+    ?>
+        <div style="height: 158px;max-width: 100%;position: relative;z-index: 3;">
 
             <?php
+            include './includes/button-to-top.php';
+            include './includes/header.php';
+            include './includes/right-navbar.php';
+            include './includes/database.php'; // Connexion à la bdd
             $a = $_SESSION['id'];
-            $allMedic = $db->query("SELECT * FROM medicament WHERE osteo_id=$a");
-            echo '<br>';
+            $allMedic = $db->query("SELECT idAnimal, nomAnimal, espece, nom, prenom FROM animal an NATURAL JOIN nom_proprio WHERE an.osteo_id=$a");
+
+            function containsSpecialChars($str)
+            {
+                if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬]/', $str)) {
+                    return true;
+                }
+                return false;
+            }
+
+            function containsNumber($str)
+            {
+                if (preg_match('#[0-9]#', $str)) {
+                    return true;
+                }
+                return false;
+            }
+
             ?>
-            <br>
+        </div>
+        <br /><br />
+
+        <div style="padding-left: 170px; margin-right: 0px; margin-left: 0px; background-color:white; max-width: 100%;">
+
+            <div class="container" style="background-color: white; max-width: 1060px; min-width: 100px!important;">
+
+                <?php
+                $a = $_SESSION['id'];
+                $allMedic = $db->query("SELECT * FROM medicament WHERE osteo_id=$a");
+                echo '<br>';
+                ?>
+                <br>
 
 
-            <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
-                <center>
-                    <br>
-                    Ajouter un médicament
-                    <br>
-                    <br>
-                    <form method="post" action="?">
+                <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                    <center>
                         <br>
-                        <input type="text" name="nomMedic" placeholder="Nom" required><br><br>
-                        <textarea type="text" name="conditionnement" placeholder="Conditionnement" rows="3" cols="80"></textarea><br>
-                        <textarea type="text" name="dilution" placeholder="Dilution" rows="3" cols="80"></textarea><br>
-                        <input type="submit" name="subMedic" value="Ajouter">
-                        <input type="reset" value="Effacer">
+                        Ajouter un médicament
                         <br>
                         <br>
-                    </form>
-                    <?php
-                    if (isset($_POST['subMedic'])) {
-                        $b = "-";
-                        $c = "-";
+                        <form method="post" action="?">
+                            <br>
+                            <input type="text" name="nomMedic" placeholder="Nom" required><br><br>
+                            <textarea type="text" name="conditionnement" placeholder="Conditionnement" rows="3" cols="80"></textarea><br>
+                            <textarea type="text" name="dilution" placeholder="Dilution" rows="3" cols="80"></textarea><br>
+                            <input type="submit" name="subMedic" value="Ajouter">
+                            <input type="reset" value="Effacer">
+                            <br>
+                            <br>
+                        </form>
+                        <?php
+                        if (isset($_POST['subMedic'])) {
+                            $b = "-";
+                            $c = "-";
 
-                        if (isset($_POST['conditionnement'])) {
-                            $b = $_POST['conditionnement'];
+                            if (isset($_POST['conditionnement'])) {
+                                $b = $_POST['conditionnement'];
+                            }
+
+                            if (isset($_POST['dilution'])) {
+                                $c = $_POST['dilution'];
+                            }
+
+
+                            $doubleAnimal = $db->prepare("SELECT * FROM medicament WHERE nomMedicament=:nom AND osteo_id= :osteoId");
+                            $doubleAnimal->execute(['nom' => $_POST['nomMedic'], 'osteoId' => $_SESSION['id']]);
+
+                            if ($doubleAnimal->rowCount() >= 1) { # verification dans la base unique de l'osteo
+                                echo 'Vous avez déjà enregistré ce médicament';
+                            } else {
+                                $createAnimal = $db->prepare("INSERT INTO medicament VALUES(DEFAULT, :a, :b, :c, :d)");
+                                $createAnimal->execute([
+                                    'a' => $_POST['nomMedic'], 'b' => $_POST['conditionnement'],
+                                    'c' => $_POST['dilution'], 'd' => $_SESSION['id'],
+                                ]);
+                        ?>
+                                <meta http-equiv="refresh" content="0">
+                        <?php
+                            }
                         }
+                        ?>
 
-                        if (isset($_POST['dilution'])) {
-                            $c = $_POST['dilution'];
-                        }
+                </div>
+                <br>
 
+                <h3 align="center"> Médicaments </h3>
+                <br />
+                <div class="table-responsive" style="position:relative;">
+                    <table id="employee_data" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Conditionnement</th>
+                                <th>Dilution</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <?php
+                        while ($x = $allMedic->fetch()) {
 
-                        $doubleAnimal = $db->prepare("SELECT * FROM medicament WHERE nomMedicament=:nom AND osteo_id= :osteoId");
-                        $doubleAnimal->execute(['nom' => $_POST['nomMedic'], 'osteoId' => $_SESSION['id']]);
-
-                        if ($doubleAnimal->rowCount() >= 1) { # verification dans la base unique de l'osteo
-                            echo 'Vous avez déjà enregistré ce médicament';
-                        } else {
-                            $createAnimal = $db->prepare("INSERT INTO medicament VALUES(DEFAULT, :a, :b, :c, :d)");
-                            $createAnimal->execute([
-                                'a' => $_POST['nomMedic'], 'b' => $_POST['conditionnement'],
-                                'c' => $_POST['dilution'], 'd' => $_SESSION['id'],
-                            ]);
-                    ?>
-                            <meta http-equiv="refresh" content="0">
-                    <?php
-                        }
-                    }
-                    ?>
-
-            </div>
-            <br>
-
-            <h3 align="center"> Médicaments </h3>
-            <br />
-            <div class="table-responsive" style="position:relative;">
-                <table id="employee_data" class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Conditionnement</th>
-                            <th>Dilution</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <?php
-                    while ($x = $allMedic->fetch()) {
-
-                        echo "<tr><td>" . $x['nomMedicament'] .
-                            "</td><td>" . $x['conditionnement'] .
-                            "</td><td>" . $x['dilution'] .
-                            "</td><td>" . ' ' . '<form method="post" action="?">
+                            echo "<tr><td>" . $x['nomMedicament'] .
+                                "</td><td>" . $x['conditionnement'] .
+                                "</td><td>" . $x['dilution'] .
+                                "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idProp" value="' . $x['idMedicament'] . '" >
                                                             <input type="submit" name="delMedic" value="supprimer">
                                                        </form>' .
-                            "</td></tr>";
-                    }
+                                "</td></tr>";
+                        }
 
-                    if (isset($_POST['delMedic'])) {
-                        $a = $_POST['idProp'];
-                        $b = $_SESSION['id'];
-                        $db->query("DELETE FROM medicament WHERE idMedicament=$a AND osteo_id=$b ");
-                    ?>
-                        <meta http-equiv="refresh" content="0">
-                    <?php
-                    }
+                        if (isset($_POST['delMedic'])) {
+                            $a = $_POST['idProp'];
+                            $b = $_SESSION['id'];
+                            $db->query("DELETE FROM medicament WHERE idMedicament=$a AND osteo_id=$b ");
+                        ?>
+                            <meta http-equiv="refresh" content="0">
+                        <?php
+                        }
 
 
-                    ?>
-                </table>
-            </div>
-            <div id="bottom-bar">
-                <!-- logo univ-->
-                <p></p>
+                        ?>
+                    </table>
+                </div>
+                <div id="bottom-bar">
+                    <!-- logo univ-->
+                    <p></p>
+                </div>
             </div>
         </div>
-    </div>
-
+    <?php
+    }
+    ?>
 </body>
 
 </html>
