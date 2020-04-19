@@ -242,6 +242,10 @@ session_start(); // On démarre la session AVANT toute chose
                                                                                                <input hidden name="print">
                                                                                                <input type="submit" name="delOrga" value="supprimer">
                                                                                                </form>
+                                                                                               <form method="post" action="./liste-animaux.php" target="_blank">
+                                                                                                    <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
+                                                                                                    <input type="submit" name="seeAnimals" value="animaux">
+                                                                                               </form> 
                                                                                                ' .
                                                   "</td></tr>";
                                         }
@@ -258,9 +262,6 @@ session_start(); // On démarre la session AVANT toute chose
                                              // on définie dans une variable de session l'organisme dont on souhaite voire les contacts
                                              $_SESSION['shownContacts'] = $_POST['idOrga'];
                                         }
-
-
-
                                         ?>
                                    </table>
                                    <br><br><br>
@@ -398,9 +399,12 @@ session_start(); // On démarre la session AVANT toute chose
                                              "</td><td>" . $t['codePostal'] .
                                              "</td><td>" . ' ' . '<form method="post" action="?">
                                                                       <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
-                                                                      <input type="submit" name="seeAnimals" value="animaux">
                                                                       <input type="submit" name="delProp" value="supprimer">
                                                                  </form>
+                                                                 <form method="post" action="./liste-animaux.php" target="_blank">
+                                                                      <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
+                                                                      <input type="submit" name="seeAnimals" value="animaux">
+                                                                 </form> 
                                                                  ' .
                                              "</td></tr>";
                                    }

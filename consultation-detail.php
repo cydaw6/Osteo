@@ -214,7 +214,7 @@ session_start();
                 <table>
                     <thead>
                         <tr>
-                            <th>Medicament</th>
+                            <th>Médicament</th>
                             <th>Produit</th>
                             <th>Fréquence</th>
                             <th>Dose</th>
