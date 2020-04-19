@@ -74,6 +74,7 @@ session_start();
         ?>
             <div class="container" style=" color:white;">
                 <?php
+                include './includes/button-to-top.php';
                 include './includes/database.php';
                 $a = $_SESSION['id'];
                 $b = $_POST['idProp'];

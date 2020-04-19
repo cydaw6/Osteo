@@ -80,6 +80,7 @@ session_start();
             <div class="container" style=" color:white;">
                 <?php
                 include './includes/database.php';
+                include './includes/button-to-top.php';
                 echo '<b>Détail de la consultation</b><br>';
                 $a = $_SESSION['id'];
                 $b = $_POST['idConsultation'];

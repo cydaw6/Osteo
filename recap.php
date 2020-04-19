@@ -45,6 +45,7 @@ session_start(); // On démarre la session AVANT toute chose
     <div style="height: 158px;max-width: 100%;position: relative;z-index: 3;">
 
         <?php
+        include './includes/button-to-top.php';
         include './includes/header.php';
         include './includes/right-navbar.php';
         include './includes/database.php'; // Connexion à la bdd
