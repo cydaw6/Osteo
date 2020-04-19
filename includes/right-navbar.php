@@ -153,11 +153,6 @@
     <ul>
       <form id="form" action="./index.php" method="post">
         <li>
-          <div class="icons"><button type="submit" name="profil"><i class="fa fa-heart"></i></div></button>
-          <div class="linktitle">Récapitulatif</div>
-
-        </li>
-        <li>
           <div class="icons"><a href="./consultations.php"><i class="fa fa-align-justify"></i></div></a><a href="./consultations.php">
             <div class="linktitle">Consultations</div>
           </a>
@@ -191,6 +186,12 @@
           </a>
           <div class="linktitle">
 
+
+        </li>
+        <li>
+          <div class="icons"><a href="./recap.php"><i class="fa fa-heart"></i></div></a><a href="./recap.php">
+            <div class="linktitle">Récapitulatif</div>
+          </a>
 
         </li>
         <li>

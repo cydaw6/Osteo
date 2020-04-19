@@ -148,7 +148,7 @@ SELECT idProprietaire, prenomPa, nomPa, osteo_id FROM proprietaire NATURAL JOIN 
                                    if ($result >= 1) { # verification dans la base unique de l'osteo
                                         echo 'Vous avez déjà enregistré cet animal pour ce propriétaire';
                                    } else {
-                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j)");
+                                        $createAnimal = $db->prepare("INSERT INTO animal VALUES(DEFAULT, :a,:b, :c, :d, :e, :f, :g, :h, :i, :j, DEFAULT)");
                                         $createAnimal->execute([
                                              'a' => $nom, 'b' => $espece,
                                              'c' => $race, 'd' => $taille,
