@@ -80,7 +80,7 @@
 			<br>
 			<form method="post" action="?">
 				<input hidden name="profil">
-				<input type="submit" name="setAcountToZero">
+				<input type="submit" name="setAcountToZero" style="background-color:red!important;border:hidden;">
 			</form>
 		</div>
 		<div style="margin-right: 1%; margin-left: 50%; height: 50px; background: white;">
@@ -88,7 +88,7 @@
 			<br>
 			<form method="post" action="?">
 				<input hidden name="profil">
-				<input type="submit" name="deleteAcount">
+				<input type="submit" name="deleteAcount" style="background-color:red!important;border:hidden;">
 			</form>
 		</div>
 		<br>

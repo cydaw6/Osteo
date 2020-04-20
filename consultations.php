@@ -337,12 +337,12 @@ session_start(); // On démarre la session AVANT toute chose
                                         "</td><td>" . $x['prix'] . ' €' .
                                         "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
-                                                            <input type="submit" name="delConsultation" value="supprimer">
+                                                            <input type="submit" name="delConsultation" value="supprimer" style="background-color:red!important;border:hidden;">
                                                        </form>
 
                                                        <form method="post" action="./consultation-detail.php" target="_blank">
                                                        <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
-                                                       <input type="submit" name="detailConsultation" value="Voir en détail">
+                                                       <input type="submit" name="detailConsultation" value="Voir en détail" style="background-color:#834fa8!important;border:hidden;">
                                                        </form> ' .
                                         "</td></tr>";
                               }

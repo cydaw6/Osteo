@@ -272,7 +272,7 @@ session_start(); // On démarre la session AVANT toute chose
                                         <br><br><br>
                                         <?php
                                         if (isset($_SESSION['shownContacts'])) {
-                                             // Affichage de la liste des contacts de l'organisme !! A CHANGER EN PAGE vu que le form marche pas impossible de supprimer le contact
+
                                              $chemin = './proprietaires.php';
                                              $a = $_SESSION['shownContacts'];
                                              include("./includes/orga-contacts.php");
@@ -281,53 +281,88 @@ session_start(); // On démarre la session AVANT toute chose
                                    </div>
                               <?php
                               }
-
-
                               if ($_SESSION['showContentProprio'] == "Particulier" || $_SESSION['showContentProprio'] != "Orga") {
                                    $allOrga = $db->query("SELECT * FROM organisme ORDER BY raisonSociale");
                               ?>
                                    <br>
                                    <div style="position= relative; padding = 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
                                         <br>
-                                        Ajouter un particulier
+                                        <?php
+                                        if (isset($_POST['modifProp'])) {
+                                             $idprop = $_POST['idProp'];
+                                             $infoPart = $db->query("SELECT * FROM particulier WHERE idProprietaire=$idprop");
+                                             $t = $infoPart->fetch();
+                                             echo 'Modifier un particulier';
+                                        } else {
+                                             echo 'Ajouter un particulier';
+                                        }
+                                        ?>
                                         <br>
                                         <br>
                                         <form method="post" action="?">
-                                             <input type="text" name="nomPa" placeholder="Nom" required>
-                                             <input type="text" name="prenomPa" placeholder="Prénom" required>
-                                             <input type="text" name="telPa" placeholder="Téléphone" required>
-                                             <input type="text" name="emailPa" placeholder="Email" required>
-                                             <input type="text" name="adresse" placeholder="Adresse" required>
-                                             <input type="text" name="localite" placeholder="Localite" required>
-                                             <input type="text" name="codePostal" placeholder="Code Postal" required>
-                                             <br>
-                                             <br>
-                                             Si contact d'un organisme
-                                             <select name="organisme">
-                                                  <option value="null"> Organisme</option>
-                                                  <?php
-                                                  while ($t = $allOrga->fetch()) {
-                                                       echo '<option value="' . $t['idProprietaire'] . '">' . $t['raisonSociale'] . '-' . $t['typeOrga'] . '</option>';
-                                                  }
-                                                  ?>
-                                             </select>
-                                             <input type="text" name="fonction" placeholder="Fonction">
 
+                                             <input type="text" name="nomPa" placeholder="Nom" <?php if (isset($_POST['modifProp'])) {
+                                                                                                    echo 'value="' . $t['nomPa'] . '"';
+                                                                                               } ?> required>
+                                             <input type="text" name="prenomPa" placeholder="Prénom" <?php if (isset($_POST['modifProp'])) {
+                                                                                                              echo 'value="' . $t['prenomPa'] . '"';
+                                                                                                         } ?>required>
+                                             <input type="text" name="telPa" placeholder="Téléphone" <?php if (isset($_POST['modifProp'])) {
+                                                                                                              echo 'value="' . $t['telPa'] . '"';
+                                                                                                         } ?>required>
+                                             <input type="text" name="emailPa" placeholder="Email" <?php if (isset($_POST['modifProp'])) {
+                                                                                                         echo 'value="' . $t['emailPa'] . '"';
+                                                                                                    } ?>required>
+                                             <input type="text" name="adresse" placeholder="Adresse" <?php if (isset($_POST['modifProp'])) {
+                                                                                                              echo 'value="' . $t['adresse'] . '"';
+                                                                                                         } ?>required>
+                                             <input type="text" name="localite" placeholder="Localite" <?php if (isset($_POST['modifProp'])) {
+                                                                                                              echo 'value="' . $t['localite'] . '"';
+                                                                                                         } ?>required>
+                                             <input type="text" name="codePostal" placeholder="Code Postal" <?php if (isset($_POST['modifProp'])) {
+                                                                                                                   echo 'value="' . $t['codePostal'] . '"';
+                                                                                                              } ?>required>
                                              <br>
-
-                                             <input type="submit" name="subProp" value="Ajouter">
-                                             <input type="reset" value="Effacer" onAction=>
+                                             <br>
+                                             <?php
+                                             if (!isset($_POST['modifProp'])) {
+                                             ?>
+                                                  Si contact d'un organisme
+                                                  <select name="organisme">
+                                                       <option value="null"> Organisme</option>
+                                                       <?php
+                                                       while ($t = $allOrga->fetch()) {
+                                                            echo '<option value="' . $t['idProprietaire'] . '">' . $t['raisonSociale'] . '-' . $t['typeOrga'] . '</option>';
+                                                       }
+                                                       ?>
+                                                  </select>
+                                                  <input type="text" name="fonction" placeholder="Fonction">
+                                             <?php
+                                             }
+                                             ?>
+                                             <br>
+                                             <?php
+                                             if (isset($_POST['modifProp'])) {
+                                                  echo '<input hidden name="idPart" value="' . $_POST['idProp'] . '">';
+                                                  echo '<input type="submit" name="formModifPart" value="Modifier">  ';
+                                                  echo '<input type="submit" value="Annuler">';
+                                             } else {
+                                                  echo '<br><br>';
+                                                  echo '<input type="submit" name="subProp" value="Ajouter">
+                                                  <input type="reset" value="Effacer">';
+                                             }
+                                             ?>
                                              <br>
                                              <br>
                                         </form>
 
                                         <?php
-                                        if (isset($_POST['subProp'])) {
+                                        if (isset($_POST['subProp']) || isset($_POST['formModifPart'])) {
                                              extract($_POST);
                                              if (
                                                   containsSpecialChars($nomPa) || containsSpecialChars($prenomPa) ||
                                                   containsSpecialChars($telPa) || containsSpecialChars($adresse) ||
-                                                  containsSpecialChars($nomPa) || containsSpecialChars($codePostal) || containsSpecialChars($fonction)
+                                                  containsSpecialChars($nomPa) || containsSpecialChars($codePostal)
                                              ) {
                                                   echo 'Les caractères spéciaux ne sont pas autorisés';
                                              } elseif (containsNumber($nomPa) || containsNumber($prenomPa)) {
@@ -339,34 +374,56 @@ session_start(); // On démarre la session AVANT toute chose
                                              } elseif (!filter_var($emailPa, FILTER_VALIDATE_EMAIL)) {
                                                   echo 'Adresse email non valide';
                                              } else {
-                                                  $q = $db->prepare("SELECT * FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:a AND emailPa=:mail");
-                                                  $q->execute(['mail' => $emailPa, 'a' => $_SESSION['id']]);
+                                                  if (isset($_POST['formModifPart'])) {
+                                                       $q = $db->prepare("SELECT * FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:a AND emailPa=:mail AND idProprietaire!=$idPart");
+                                                       $q->execute(['mail' => $emailPa, 'a' => $_SESSION['id']]);
+                                                  } else {
+                                                       $q = $db->prepare("SELECT * FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:a AND emailPa=:mail");
+                                                       $q->execute(['mail' => $emailPa, 'a' => $_SESSION['id']]);
+                                                  }
+
                                                   $numb = $q->rowCount();
                                                   if ($numb != 0) {
                                                        echo 'Cette adresse email est déjà utilisée';
                                                   } else {
-                                                       $homonyme = $db->prepare("SELECT idProprietaire FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:ostId AND nomPa= :nomPa AND prenomPa= :prenomPa AND adresse= :adresse AND localite= :localite");
-                                                       $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'adresse' => $adresse, 'localite' => $localite, 'ostId' => $_SESSION['id']]);
+                                                       if (isset($_POST['formModifPart'])) {
+                                                            $homonyme = $db->prepare("SELECT idProprietaire FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:ostId AND nomPa= :nomPa AND prenomPa= :prenomPa AND adresse= :adresse AND localite= :localite AND idProprietaire!=$idPart");
+                                                            $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'adresse' => $adresse, 'localite' => $localite, 'ostId' => $_SESSION['id']]);
+                                                       } else {
+                                                            $homonyme = $db->prepare("SELECT idProprietaire FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:ostId AND nomPa= :nomPa AND prenomPa= :prenomPa AND adresse= :adresse AND localite= :localite");
+                                                            $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'adresse' => $adresse, 'localite' => $localite, 'ostId' => $_SESSION['id']]);
+                                                       }
                                                        $result = $homonyme->rowCount();
                                                        if ($result >= 1) {
-
-                                                            $samePersonID = $homonyme->fetch();
-                                                            $homonyme2 = $db->prepare("SELECT * FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:osteoId AND idProprietaire=:idProp");
-                                                            $homonyme2->execute(['osteoId' => $_SESSION['id'], 'idProp' => $samePersonID['idProprietaire']]);
-                                                            $nb = $homonyme2->rowCount();
-
-                                                            if ($nb >= 1) { # verification dans la base unique de l'osteo
-                                                                 echo 'Cette personne est déjà enregistrée';
-                                                            } else {
-                                                                 addPersonalProprio($db, $samePersonID['idProprietaire']);
-                                                            }
+                                                            echo 'Cette personne est déjà enregistrée';
                                                        } else {
-                                                            addParticulier($db);
+                                                            if (isset($_POST['formModifPart'])) {
+                                                                 echo '<h1>ouaiii</h1>';
+                                                                 $i = $_POST['idPart'];
+                                                                 $prep = $db->prepare("UPDATE particulier SET nomPa=:nomPa, prenomPa=:prenomPa, telPa=:telPa, emailPa=:emailPa, adresse=:adresse, localite=:localite, codePostal=:codePostal WHERE idProprietaire=:i");
+                                                                 $prep->execute([
+                                                                      'nomPa' => $nomPa,
+                                                                      'prenomPa' => $prenomPa,
+                                                                      'telPa' => $telPa, 'emailPa' => $emailPa, 'adresse' => $adresse, 'localite' => $localite, 'codePostal' => $codePostal,
+                                                                      'i' => $i
+                                                                 ]);
+                                        ?>
+                                                                 <meta http-equiv="refresh" content="0">
+                                        <?php
+                                                            } else {
+                                                                 addParticulier($db);
+                                                            }
                                                        }
                                                   }
                                              }
                                         }
+
+
                                         ?>
+
+
+
+
                                    </div>
                                    <br>
                          </div>
@@ -399,8 +456,9 @@ session_start(); // On démarre la session AVANT toute chose
                                                   "</td><td>" . ' ' . '<form method="post" action="?">
                                                                       <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
                                                                       <input type="submit" name="modifProp" value="modifier" style="background-color:#4f8196!important;border:hidden;">
-                                                                      <input type="submit" name="delProp" value="supprimer" style="background-color:red!important;border:hidden;">
+                                                                      <input type="submit" name="delProp" value="supprimer" style="background-color:red!important;border:hidden;">  
                                                                  </form>
+
                                                                  <form method="post" action="./liste-animaux.php" target="_blank">
                                                                       <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
                                                                       <input type="submit" name="seeAnimals" value="animaux" style="background-color:#834fa8!important;border:hidden;">
