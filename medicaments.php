@@ -184,15 +184,16 @@ session_start(); // On démarre la session AVANT toute chose
                         </thead>
                         <?php
                         while ($x = $allMedic->fetch()) {
-
-                            echo "<tr><td>" . $x['nomMedicament'] .
-                                "</td><td>" . $x['conditionnement'] .
-                                "</td><td>" . $x['dilution'] .
-                                "</td><td>" . ' ' . '<form method="post" action="?">
+                            if ($x['idMedicament'] != 0) {
+                                echo "<tr><td>" . $x['nomMedicament'] .
+                                    "</td><td>" . $x['conditionnement'] .
+                                    "</td><td>" . $x['dilution'] .
+                                    "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idProp" value="' . $x['idMedicament'] . '" >
-                                                            <input type="submit" name="delMedic" value="supprimer">
+                                                            <input type="submit" name="delMedic" value="supprimer" style="background-color:red!important;border:hidden;">
                                                        </form>' .
-                                "</td></tr>";
+                                    "</td></tr>";
+                            }
                         }
 
                         if (isset($_POST['delMedic'])) {

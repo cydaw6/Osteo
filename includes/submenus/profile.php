@@ -26,7 +26,10 @@
 	<div style="margin-left: 1%;margin-right: 1%;bottom: 0px;height: 50px; max-width: 100%;border-radius: 2px;background-color: white;border: #d5dbdb 1px solid;box-shadow: 3px 3px 3px #aaaaaa;">
 		<br>
 		<span style="font-size: 20px;font-weight: bold;">
-			<?php echo $_SESSION['username']; ?>
+			<?php
+			$s = ($_SESSION['isAdmin'] == true) ? '<span style="color: red;">Admin</span>' : "";
+			echo  $s . ' ' . $_SESSION['username'];
+			?>
 		</span>
 	</div>
 

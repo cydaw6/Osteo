@@ -81,7 +81,8 @@
                 $secure_username = str_replace(array("\n", "\r", PHP_EOL), '', $username);
                 $secure_email = str_replace(array("\n", "\r", PHP_EOL), '', $email); // on sécurise le mail pour éviter les injections de retour de lignes même si filter s'en occupe
 
-                $q = $db->prepare("INSERT INTO users(username,email,password) VALUES(:username,:email,:password)");
+                $q = $db->prepare("INSERT INTO users VALUES(DEFAULT, :username,:email,:password, DEFAULT, 0)");
+
 
                 $q->execute([
                   'username' => $secure_username,

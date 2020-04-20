@@ -54,7 +54,6 @@ session_start(); // On démarre la session AVANT toute chose
                include './includes/header.php';
                include './includes/right-navbar.php';
                include './includes/database.php'; // Connexion à la bdd
-               $idosteo = $_SESSION['id'];
 
                function containsSpecialChars($str)
                {
@@ -86,7 +85,12 @@ session_start(); // On démarre la session AVANT toute chose
                     // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
                     $a = $_SESSION['id'];
                     $allProprio = $db->query("SELECT * FROM nom_proprio WHERE osteo_id=$a ORDER BY nom");
-                    $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
+                    if ($_SESSION['isAdmin']) {
+                         $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio NATURAL JOIN users");
+                    } else {
+                         $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
+                    }
+
                     ?>
                     <br>
                     <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
@@ -114,7 +118,7 @@ session_start(); // On démarre la session AVANT toute chose
                                         <option value="m">Mâle</option>
                                         <option value="f">Femelle</option>
                                    </select>
-                                   <label for="castration">Castration:</label>
+                                   Castration:
                                    <select name="castration">
                                         <option value="n">non</option>
                                         <option value="o">oui</option>
@@ -182,6 +186,11 @@ session_start(); // On démarre la session AVANT toute chose
                                         <th>Sexe</th>
                                         <th>Castration</th>
                                         <th>Propriétaire</th>
+                                        <?php
+                                        if ($_SESSION['isAdmin']) {
+                                             echo '<th>Utilisateur</th>';
+                                        }
+                                        ?>
                                         <th>Action</th>
 
                                    </tr>
@@ -198,11 +207,14 @@ session_start(); // On démarre la session AVANT toute chose
                                         "</td><td>" . $x['poids'] . ' kg' .
                                         "</td><td>" . $s .
                                         "</td><td>" . $c .
-                                        "</td><td>" . $x['nom'] . '  ' . $x['prenom'] .
-                                        "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
+                                        "</td><td>" . $x['nom'] . '  ' . $x['prenom'];
+                                   if ($_SESSION['isAdmin']) {
+                                        echo "</td><td>" . $x['username'];
+                                   }
+                                   echo "</td><td>" . ' ' . '<form method="post" action="./animaux.php">
                                                             <input type="hidden" name="idAnimal" value="' . $x['idAnimal'] . '" >
-                                                            <input type="submit" name="majAnimal" value="modifier">
-                                                            <input type="submit" name="delAnimal" value="supprimer">
+                                                            <input type="submit" name="majAnimal" value="modifier" style="background-color:#4f8196!important;border:hidden;">
+                                                            <input type="submit" name="delAnimal" value="supprimer" style="background-color:red!important;border:hidden;">
                                                        </form>' .
                                         "</td></tr>";
                               }

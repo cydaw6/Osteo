@@ -9,7 +9,15 @@ session_start(); // On démarre la session AVANT toute chose
   <title>Osteo - login</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style2.scss">
 
+  <style>
+    input[type=text],
+    input[type=password] {
+      height: 35px !important;
+      padding: 2px 2px 2px 9px;
+    }
+  </style>
 </head>
 
 <body>
@@ -30,9 +38,9 @@ session_start(); // On démarre la session AVANT toute chose
 
       <br><br>
       <form action="./login.php" method="post" id="login" style="position: relative;margin: 0 auto; padding: 10px 20%;">
-        <input style="position: relative;" type='text' name='username' id='username' placeholder="  Nom d'utilisateur" required><br><br>
+        <input class="clean-slide" id="weight" style="position: relative;" type='text' name='username' id='username' placeholder="  Nom d'utilisateur" required><br><br>
         <input type='password' name='password' id='password' placeholder="  Mot de passe" required><br><br>
-        <input style=" width: 300px; margin: 10px auto;" type="submit" name="log" id="log" value="Connexion" />
+        <input style=" width: 320px; margin: 10px auto;" type="submit" name="log"  value="Connexion" />
         <!--<a id="bouton-simple" href="./sign.php"><button type="button">Pas encore inscrit ?</button></a>-->
       </form>
 
@@ -67,7 +75,7 @@ session_start(); // On démarre la session AVANT toute chose
                 $_SESSION['showContentProprio'] = "none";
                 $_SESSION['choixAnimalConsult'] = "-1";
                 $_SESSION['showTypeAndPlace'] = "none";
-
+                $_SESSION['isAdmin'] = ($result['admin'] == 1) ? true : false;
                 echo '<meta http-equiv="refresh" content="2;URL=./index.php">';
               } else {
                 echo '<p style="color: red;">L\'email ou le mot de passe est incorrect</p>';

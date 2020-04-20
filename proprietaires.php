@@ -50,7 +50,7 @@ session_start(); // On démarre la session AVANT toute chose
                include './includes/right-navbar.php';
                include './includes/database.php'; // Connexion à la bdd
                $a = $_SESSION['id'];
-               $tableParticulier = $db->query("SELECT nomPa, prenomPa, telPa, emailPa, adresse, localite, codePostal, idProprietaire FROM particulier NATURAL JOIN possede_proprio WHERE osteo_id=$a");
+               $tableParticulier = $db->query("SELECT nomPa, prenomPa, telPa, emailPa, adresse, localite, codePostal, idProprietaire FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=$a");
 
                function containsNumber($str)
                {
@@ -71,7 +71,8 @@ session_start(); // On démarre la session AVANT toute chose
                function addParticulier($db)
                {
                     $db->beginTransaction(); // Opération sécurisée car plusieurs personnes peuvent ajouter des propriétaires !
-                    $db->query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
+                    $a = $_SESSION['id'];
+                    $db->query("INSERT INTO proprietaire VALUES(DEFAULT, $a)");
                     $result = $db->query("SELECT idProprietaire FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
                     $id = $result->fetch();
                     /* On valide les modifications */
@@ -87,8 +88,6 @@ session_start(); // On démarre la session AVANT toute chose
                          'g' => $_POST['localite'],
                          'h' => $_POST['codePostal']
                     ));
-                    $possedeProprio = $db->prepare("INSERT INTO `possede_proprio` VALUES(:idProp, :userID) ");
-                    $possedeProprio->execute(['userID' =>  $_SESSION['id'], 'idProp' => $id['idProprietaire']]);
 
                     /* SI contact d'un organisme on l'ajoute à `a_contacter` */
 
@@ -112,7 +111,7 @@ session_start(); // On démarre la session AVANT toute chose
 
                function addPersonalProprio($db, $id)
                {
-                    $possedeProprio = $db->prepare("INSERT INTO `possede_proprio` VALUES(:idProp, :userID) ");
+                    $possedeProprio = $db->prepare("INSERT INTO `proprietaire` VALUES(:idProp, :userID) ");
                     $possedeProprio->execute(['userID' =>  $_SESSION['id'], 'idProp' => $id]);
                     /* On rafraichi la page */
                ?>
@@ -159,7 +158,7 @@ session_start(); // On démarre la session AVANT toute chose
 
                               if ($_SESSION['showContentProprio'] == "Orga") {
                                    $a = $_SESSION['id'];
-                                   $tableOrga = $db->query("SELECT idProprietaire, raisonSociale, typeOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
+                                   $tableOrga = $db->query("SELECT idProprietaire, raisonSociale, typeOrga FROM organisme NATURAL JOIN proprietaire WHERE osteo_id=$a");
                                    $typeOrga = $db->query("SELECT * FROM type_orga");
                               ?>
                                    <div style="position:relative; padding: 3px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
@@ -181,7 +180,6 @@ session_start(); // On démarre la session AVANT toute chose
                                              <input hidden name="printChoice" value="Orga">
                                              <input hidden name="print">
                                              <input type="submit" name="subOrga" value="Ajouter">
-                                             <input type="reset" value="Effacer">
                                              <br>
                                              <br>
                                         </form>
@@ -196,7 +194,7 @@ session_start(); // On démarre la session AVANT toute chose
                                              echo 'Les caractères spéciaux ne sont pas autorisés';
                                         } else {
                                              /* On verif que l'organisme n'existe pas déjà */
-                                             $alreadyExist = $db->prepare("SELECT raisonSociale FROM organisme NATURAL JOIN possede_proprio WHERE raisonSociale=:a AND osteo_id=:b");
+                                             $alreadyExist = $db->prepare("SELECT raisonSociale FROM organisme NATURAL JOIN proprietaire WHERE raisonSociale=:a AND osteo_id=:b");
                                              $alreadyExist->execute(['a' => $_POST['raison'], 'b' => $_SESSION['id']]);
 
                                              if ($alreadyExist->rowCount() >= 1) {
@@ -211,13 +209,13 @@ session_start(); // On démarre la session AVANT toute chose
                                                   } else { // sinon on l'ajoute et au général
 
                                                        $db->beginTransaction(); // Opération sécurisée car plusieurs personnes peuvent ajouter des propriétaires !
-                                                       $db->query("INSERT INTO proprietaire (idProprietaire) VALUES (DEFAULT);");
+                                                       $a = $_SESSION['id'];
+                                                       $db->query("INSERT INTO proprietaire VALUES(DEFAULT, $a);");
                                                        $result = $db->query("SELECT idProprietaire FROM proprietaire WHERE idProprietaire=LAST_INSERT_ID();"); // On récupère l'id tout juste créé
                                                        $id = $result->fetch();
 
                                                        /* On valide les modifications */
                                                        $db->commit();
-
                                                        $op = $db->prepare("INSERT INTO organisme VALUES(:id, :rSoc, :typeO)");
                                                        $res = $op->execute(['id' => $id['idProprietaire'], 'rSoc' => $_POST['raison'], 'typeO' => $_POST['typeOrga']]);
                                                        addPersonalProprio($db, $id['idProprietaire']);
@@ -243,14 +241,14 @@ session_start(); // On démarre la session AVANT toute chose
                                                        "</td><td>" . $t['typeOrga'] .
                                                        "</td><td>" . ' ' . '<form method="post" action="?">
                                                                                                <input type="hidden" name="idOrga" value="' . $t['idProprietaire'] . '" >
-                                                                                               <input type="submit" name="seeOrga" value="Voir les contacts">
+                                                                                               <input type="submit" name="seeOrga" value="Voir les contacts" style="background-color:#4f8196!important;border:hidden;">
                                                                                                <input hidden name="printChoice" value="Orga">
                                                                                                <input hidden name="print">
-                                                                                               <input type="submit" name="delOrga" value="supprimer">
+                                                                                               <input type="submit" name="delOrga" value="supprimer" style="background-color:red!important;border:hidden;">
                                                                                                </form>
                                                                                                <form method="post" action="./liste-animaux.php" target="_blank">
                                                                                                     <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
-                                                                                                    <input type="submit" name="seeAnimals" value="animaux">
+                                                                                                    <input type="submit" name="seeAnimals" value="animaux" style="background-color:#834fa8!important;border:hidden;">
                                                                                                </form> 
                                                                                                ' .
                                                        "</td></tr>";
@@ -259,7 +257,8 @@ session_start(); // On démarre la session AVANT toute chose
                                              if (isset($_POST['delOrga'])) {
                                                   $s = $_SESSION['id'];
                                                   $o = $_POST['idOrga'];
-                                                  $db->query("DELETE FROM `possede_proprio` WHERE osteo_id=$s AND idProprietaire=$o ");
+                                                  $db->query("DELETE FROM `organisme` WHERE idProprietaire=$o ");
+                                                  $db->query("DELETE FROM `proprietaire` WHERE osteo_id=$s AND idProprietaire=$o ");
                                              ?>
                                                   <meta http-equiv="refresh" content="0">
                                              <?php
@@ -339,40 +338,39 @@ session_start(); // On démarre la session AVANT toute chose
                                                   echo 'Le code postal ne doit contenir que des chiffres';
                                              } elseif (!filter_var($emailPa, FILTER_VALIDATE_EMAIL)) {
                                                   echo 'Adresse email non valide';
-                                                  $quer = $db->query("SELECT email FROM particulier WHERE email= :email");
-                                                  $quer->execute(['email' => $emailPa]);
-                                                  $numb = $quer->rowCount();
-                                                  if ($numb >= 1) {
-                                                       echo 'Cette adresse email est déjà utilisée';
-                                                  }
                                              } else {
-                                                  $homonyme = $db->prepare("SELECT idProprietaire FROM particulier WHERE nomPa= :nomPa AND prenomPa= :prenomPa AND adresse= :adresse AND localite= :localite");
-                                                  $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'adresse' => $adresse, 'localite' => $localite]);
-                                                  $result = $homonyme->rowCount();
-                                                  if ($result >= 1) { # verification dans la base générale
-                                                       $samePersonID = $homonyme->fetch();
-                                                       $homonyme2 = $db->prepare("SELECT * FROM particulier NATURAL JOIN `possede_proprio` WHERE osteo_id=:osteoId AND idProprietaire=:idProp");
-                                                       $homonyme2->execute(['osteoId' => $_SESSION['id'], 'idProp' => $samePersonID['idProprietaire']]);
-                                                       $nb = $homonyme2->rowCount();
-
-                                                       if ($nb >= 1) { # verification dans la base unique de l'osteo
-                                                            echo 'Cette personne est déjà enregistrée';
-                                                       } else {
-                                                            addPersonalProprio($db, $samePersonID['idProprietaire']);
-                                                       }
+                                                  $q = $db->prepare("SELECT * FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:a AND emailPa=:mail");
+                                                  $q->execute(['mail' => $emailPa, 'a' => $_SESSION['id']]);
+                                                  $numb = $q->rowCount();
+                                                  if ($numb != 0) {
+                                                       echo 'Cette adresse email est déjà utilisée';
                                                   } else {
-                                                       addParticulier($db);
+                                                       $homonyme = $db->prepare("SELECT idProprietaire FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:ostId AND nomPa= :nomPa AND prenomPa= :prenomPa AND adresse= :adresse AND localite= :localite");
+                                                       $homonyme->execute(['nomPa' => $nomPa, 'prenomPa' => $prenomPa, 'adresse' => $adresse, 'localite' => $localite, 'ostId' => $_SESSION['id']]);
+                                                       $result = $homonyme->rowCount();
+                                                       if ($result >= 1) {
+
+                                                            $samePersonID = $homonyme->fetch();
+                                                            $homonyme2 = $db->prepare("SELECT * FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=:osteoId AND idProprietaire=:idProp");
+                                                            $homonyme2->execute(['osteoId' => $_SESSION['id'], 'idProp' => $samePersonID['idProprietaire']]);
+                                                            $nb = $homonyme2->rowCount();
+
+                                                            if ($nb >= 1) { # verification dans la base unique de l'osteo
+                                                                 echo 'Cette personne est déjà enregistrée';
+                                                            } else {
+                                                                 addPersonalProprio($db, $samePersonID['idProprietaire']);
+                                                            }
+                                                       } else {
+                                                            addParticulier($db);
+                                                       }
                                                   }
                                              }
                                         }
-
                                         ?>
-
                                    </div>
                                    <br>
                          </div>
                          <center>
-
                               <h3 align="center"> Particuliers </h3>
                               <br />
                               <div class="table-responsive" style="position=relative;">
@@ -390,11 +388,6 @@ session_start(); // On démarre la session AVANT toute chose
                                              </tr>
                                         </thead>
                                         <?php
-
-                                        /*
-                                   "</td><td>".' | '. '<button id ="'. $t['idProprietaire'] .'" >Modifier</button> <button id=" ' . $t['idProprietaire'] .' " onClick="supprProp(this.id)">supprimer</button>'.
-                                   */
-
                                         while ($t = $tableParticulier->fetch()) {
                                              echo "<tr><td>" . $t['nomPa'] .
                                                   "</td><td>" . $t['prenomPa'] .
@@ -405,11 +398,12 @@ session_start(); // On démarre la session AVANT toute chose
                                                   "</td><td>" . $t['codePostal'] .
                                                   "</td><td>" . ' ' . '<form method="post" action="?">
                                                                       <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
-                                                                      <input type="submit" name="delProp" value="supprimer">
+                                                                      <input type="submit" name="modifProp" value="modifier" style="background-color:#4f8196!important;border:hidden;">
+                                                                      <input type="submit" name="delProp" value="supprimer" style="background-color:red!important;border:hidden;">
                                                                  </form>
                                                                  <form method="post" action="./liste-animaux.php" target="_blank">
                                                                       <input type="hidden" name="idProp" value="' . $t['idProprietaire'] . '" >
-                                                                      <input type="submit" name="seeAnimals" value="animaux">
+                                                                      <input type="submit" name="seeAnimals" value="animaux" style="background-color:#834fa8!important;border:hidden;">
                                                                  </form> 
                                                                  ' .
                                                   "</td></tr>";
@@ -419,7 +413,9 @@ session_start(); // On démarre la session AVANT toute chose
                                         if (isset($_POST['delProp'])) {
                                              $s = $_SESSION['id'];
                                              $o = $_POST['idProp'];
-                                             $db->query("DELETE FROM `possede_proprio` WHERE  osteo_id=$s AND idProprietaire=$o ");
+                                             $db->query("DELETE FROM `a_contacter` WHERE idProprietaire=$o ");
+                                             $db->query("DELETE FROM `particulier` WHERE idProprietaire=$o ");
+                                             $db->query("DELETE FROM `proprietaire` WHERE osteo_id=$s AND idProprietaire=$o ");
                                         ?>
                                              <meta http-equiv="refresh" content="0">
                                         <?php

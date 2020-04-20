@@ -55,7 +55,7 @@ session_start(); // On démarre la session AVANT toute chose
         }
 
         #describeAnimal tr:nth-child(even) {
-            background-color: #262626;
+            background-color: #a3a3a3;
         }
 
         #describeAnimal tr:nth-child(odd) {
@@ -121,7 +121,7 @@ session_start(); // On démarre la session AVANT toute chose
 
                         <form method="post" action="?">
                             <select name="see" onchange="this.form.submit()">
-                                <option value="">None</option>
+                                <option value="">Vue</option>
                                 <option value="rien">Ne rien voir</option>
                                 <option value="seeLieu">Voir les lieux</option>
                                 <option value="seeType">Voir les types de consultations</option>
@@ -164,19 +164,22 @@ session_start(); // On démarre la session AVANT toute chose
                             $result = $db->query("SELECT * FROM lieu_consultation WHERE osteo_id=$a ORDER BY lieuConsultation");
                             if ($result->rowCount() >= 1) {
                                 echo '<table id="describeAnimal">
-                              <tr>
-                                   <th>Lieux de Consultation</th>
-                                   <th>Action</th>
-                              <tr>';
+                                        <tr>
+                                            <th>Lieux de Consultation</th>
+                                            <th>Action</th>
+                                        <tr>';
                                 while ($t = $result->fetch()) {
                                     echo '<tr>
-                                 <td>' . $t['lieuConsultation'] .
-                                        '</td><td><form method="post" action="?">
-                                            <input type="hidden" name="idLieu" value="' . $t['id_lieu'] . '" >
-                                            <input type="submit" name="delLieu" value="supprimer">
-                                 </form>
-                                </td></tr></table>';
+                                 <td>' . $t['lieuConsultation'] . '</td>
+                                        <td><form method="post" action="?">
+                                            <input type="hidden" name="idLieu" value="' . $t['id_lieu'] . '">
+                                            <input type="submit" name="delLieu" value="supprimer" style="background-color:red!important;border:hidden;">
+                                            </form>
+                                        </td>
+                                </tr>
+                                ';
                                 }
+                                echo '</table>';
                             }
                             if (isset($_POST['delLieu'])) {
                                 $prep = $db->prepare("DELETE FROM lieu_consultation WHERE id_lieu=:c AND osteo_id=:d");
@@ -196,18 +199,21 @@ session_start(); // On démarre la session AVANT toute chose
                                    <th>Action</th>
                               <tr>';
                                 while ($x = $result->fetch()) {
-                                    echo '<tr>
-                                 <td>' . $x['typeConsultation'] .
-                                        '</td><td><form method="post" action="?">
+                                    echo '
+                                    <tr> <td>' . $x['typeConsultation'] . ' ' . $x['id_type'] . '</td>
+                                    <td>
+                                        <form method="post" action="?">
                                             <input type="hidden" name="idType" value="' . $x['id_type'] . '" >
-                                            <input type="submit" name="delType" value="supprimer">
-                                 </form>
-                                </td></tr></table>';
+                                            <input type="submit" name="delType" value="supprimer" style="background-color:red!important;border:hidden;">
+                                        </form>
+                                </td>
+                                </tr>';
                                 }
+                                echo '</table>';
                             }
 
                             if (isset($_POST['delType'])) {
-                                $prep = $db->prepare("DELETE FROM type_consultation WHERE id_type=$c AND osteo_id=$d");
+                                $prep = $db->prepare("DELETE FROM type_consultation WHERE id_type=:c AND osteo_id=:d");
                                 $prep->execute(['c' => $_POST['idType'], 'd' => $_SESSION['id']]);
                             ?>
                                 <meta http-equiv="refresh" content="0">
@@ -274,8 +280,8 @@ session_start(); // On démarre la session AVANT toute chose
                     <table id="employee_data" class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>Lieu de Consultation</th>
-                                <th>Type de consultation</th>
+                                <th>Lieux de Consultation</th>
+                                <th>Types de consultation</th>
                                 <th>Prix</th>
                                 <th>Action</th>
                             </tr>
@@ -290,7 +296,7 @@ session_start(); // On démarre la session AVANT toute chose
                                 "</td><td>" . $x['prix'] . ' €' .
                                 "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idTarif" value="' . $x['idTarif'] . '" >
-                                                            <input type="submit" name="delTarif" value="supprimer">
+                                                            <input type="submit" name="delTarif" value="supprimer" style="background-color:red!important;border:hidden;">
                                                        </form>' .
                                 "</td></td>";
                         }

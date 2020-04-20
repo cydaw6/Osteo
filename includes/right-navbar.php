@@ -152,6 +152,9 @@
   <aside id="nav2">
     <ul>
       <form id="form" action="./index.php" method="post">
+        <?php
+
+        ?>
         <li>
           <div class="icons"><a href="./consultations.php"><i class="fa fa-align-justify"></i></div></a><a href="./consultations.php">
             <div class="linktitle">Consultations</div>
@@ -172,22 +175,42 @@
           <!-- <input class="subm" type="submit" name="proprietaires" value="Propriétaires">
                 -->
         </li>
-        <li>
-          <div class="icons"><a href="./medicaments.php"><i class="fa fa-medkit"></i></a></div><a href="./medicaments.php">
-            <div class="linktitle">Médicaments</div></i>
-          </a>
-          <div class="linktitle">
+        <?php
+        if (!$_SESSION['isAdmin']) {
+        ?>
+          <li>
+            <div class="icons"><a href="./medicaments.php"><i class="fa fa-medkit"></i></a></div><a href="./medicaments.php">
+              <div class="linktitle">Médicaments</div></i>
+            </a>
+            <div class="linktitle">
 
 
-        </li>
-        <li>
-          <div class="icons"><a href="./tarif.php"><i class="fa fa-usd" aria-hidden="true"></i></a></div><a href="./tarif.php">
-            <div class="linktitle">Tarifs</div></i>
-          </a>
-          <div class="linktitle">
-
-
-        </li>
+          </li>
+          <li>
+            <div class="icons"><a href="./tarif.php"><i class="fa fa-usd" aria-hidden="true"></i></a></div><a href="./tarif.php">
+              <div class="linktitle">Tarifs</div></i>
+            </a>
+            <div class="linktitle">
+          </li>
+        <?php
+        }
+        if ($_SESSION['isAdmin']) {
+        ?>
+          <li>
+            <div class="icons"><a href="./tarif.php"><i class="fa fa-address-book-o" aria-hidden="true"></i></a></div><a href="./admin/users.php">
+              <div class="linktitle">Utilisateurs</div></i>
+            </a>
+            <div class="linktitle">
+          </li>
+          <li>
+            <div class="icons"><a href="./tarif.php"><i class="fa fa-file" aria-hidden="true"></i></a></div><a href="./admin/users.php">
+              <div class="linktitle">Articles</div></i>
+            </a>
+            <div class="linktitle">
+          </li>
+        <?php
+        }
+        ?>
         <li>
           <div class="icons"><a href="./recap.php"><i class="fa fa-heart"></i></div></a><a href="./recap.php">
             <div class="linktitle">Récapitulatif</div>
@@ -195,7 +218,7 @@
 
         </li>
         <li>
-          <div class="icons"><button type="submit" name="profil"><i class="fa fa-user"></i></div></button>
+          <div class="icons"><button type="submit" name="profil"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div></button>
           <div class="linktitle">
             <input class="subm" type="submit" name="profil" value="Profil             ">
         </li>

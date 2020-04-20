@@ -82,11 +82,11 @@ session_start(); // On démarre la session AVANT toute chose
                         $r = $q->fetch();
                         echo '<p>Nombre d\'animaux enregistrés : ' . $r['nbAnimaux'] . '</p>';
 
-                        $q = $db->query("SELECT COUNT(*) nbParticuliers FROM particulier NATURAL JOIN possede_proprio WHERE osteo_id=$a");
+                        $q = $db->query("SELECT COUNT(*) nbParticuliers FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=$a");
                         $r = $q->fetch();
                         echo '<p>Nombre de particuliers enregistrés : ' . $r['nbParticuliers'] . '</p>';
 
-                        $q = $db->query("SELECT COUNT(*) nbOrga FROM organisme NATURAL JOIN possede_proprio WHERE osteo_id=$a");
+                        $q = $db->query("SELECT COUNT(*) nbOrga FROM organisme NATURAL JOIN proprietaire WHERE osteo_id=$a");
                         $r = $q->fetch();
                         echo '<p>Nombre d\'organismes enregistrés : ' . $r['nbOrga'] . '</p>';
 

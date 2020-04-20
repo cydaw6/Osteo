@@ -29,9 +29,9 @@
         </form>
         <?php
         if (isset($_POST['subTraitement'])) {
-            $b = $_SESSION['idLastConsultation'];
+            $b = $idLastConsultation;
             $c = $_POST['idMedicament'];
-            $verif = $db->query("SELECT * FROM traitement WHERE idConsultation=$b AND idMedicament=$c");
+            $verif = $db->query("SELECT * FROM traitement WHERE idConsultation=$b AND idMedicament=$c AND idMedicament!=0");
             if ($verif->rowCount() >= 1) { # verification dans la base unique de l'osteo
                 echo 'Vous avez déjà associer un traitement avec ce médicament';
             } else {
