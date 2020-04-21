@@ -197,26 +197,29 @@
         if ($_SESSION['isAdmin']) {
         ?>
           <li>
-            <div class="icons"><a href="./tarif.php"><i class="fa fa-address-book-o" aria-hidden="true"></i></a></div><a href="./admin/users.php">
+            <div class="icons"><a href="./tarif.php"><i class="fa fa-address-book-o" aria-hidden="true"></i></a></div><a href="./users.php">
               <div class="linktitle">Utilisateurs</div></i>
             </a>
             <div class="linktitle">
           </li>
           <li>
-            <div class="icons"><a href="./tarif.php"><i class="fa fa-file" aria-hidden="true"></i></a></div><a href="./admin/users.php">
+            <div class="icons"><a href="./tarif.php"><i class="fa fa-file" aria-hidden="true"></i></a></div><a href="./articles.php">
               <div class="linktitle">Articles</div></i>
             </a>
             <div class="linktitle">
           </li>
         <?php
+        } else {
+        ?>
+          <li>
+            <div class="icons"><a href="./recap.php"><i class="fa fa-heart"></i></div></a><a href="./recap.php">
+              <div class="linktitle">Récapitulatif</div>
+            </a>
+
+          </li>
+        <?php
         }
         ?>
-        <li>
-          <div class="icons"><a href="./recap.php"><i class="fa fa-heart"></i></div></a><a href="./recap.php">
-            <div class="linktitle">Récapitulatif</div>
-          </a>
-
-        </li>
         <li>
           <div class="icons"><button type="submit" name="profil"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div></button>
           <div class="linktitle">

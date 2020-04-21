@@ -112,37 +112,41 @@ session_start(); // On démarre la session AVANT toute chose
                     <br>
                     <br>
                     <br>
-                    <form method="post" action="?" style="position:relative;">
-                         Choisir un animal pour la consultation
-                         <select name="choiceAnimal" onchange="this.form.submit()">
-                              <option>Animal</option>
-                              <?php
-                              while ($t = $allAnimals->fetch()) {
-                                   echo '<option value="' . $t['idAnimal'] . '">' . $t['nomAnimal'] . ' | ' . $t['nom'] . '  ' . $t['prenom'] . '</option>';
-                              }
-                              ?>
-                              <option hidden> --- -- --- -----ooooooooooooooooooooooooooooooooo o o o o o o o o oo o o-- ---- --- ----- -- -- - </option>
-                         </select>
-                         <input type="submit" name="choixAnimal" hidden>
-                         <?php
-                         if (isset($_POST['choiceAnimal'])) {
-                              $_SESSION['choixAnimalConsult'] = $_POST['choiceAnimal'];
-                         }
-
-                         ?>
-                    </form>
 
                     <?php
-                    // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
-                    $allProprio = $db->query("SELECT * FROM nom_proprio");
-                    $a = $_SESSION['id'];
-                    $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
-                    echo '<br>';
-                    if ($_SESSION['choixAnimalConsult'] != "-1") {
-                         $idAnimal = $_SESSION['choixAnimalConsult'];
-                         $infoAnimal = $db->query("SELECT * FROM `animal` NATURAL JOIN nom_proprio WHERE idAnimal=$idAnimal");
+                    if (!isset($_SESSION['isAdmin'])) {
+                    ?>
+                         <form method="post" action="?" style="position:relative;">
+                              Choisir un animal pour la consultation
+                              <select name="choiceAnimal" onchange="this.form.submit()">
+                                   <option>Animal</option>
+                                   <?php
+                                   while ($t = $allAnimals->fetch()) {
+                                        echo '<option value="' . $t['idAnimal'] . '">' . $t['nomAnimal'] . ' | ' . $t['nom'] . '  ' . $t['prenom'] . '</option>';
+                                   }
+                                   ?>
+                                   <option hidden> --- -- --- -----ooooooooooooooooooooooooooooooooo o o o o o o o o oo o o-- ---- --- ----- -- -- - </option>
+                              </select>
+                              <input type="submit" name="choixAnimal" hidden>
+                              <?php
+                              if (isset($_POST['choiceAnimal'])) {
+                                   $_SESSION['choixAnimalConsult'] = $_POST['choiceAnimal'];
+                              }
 
-                         echo '<table id="describeAnimal">
+                              ?>
+                         </form>
+
+                         <?php
+                         // Attention ici la raison sociale devient un prenom et le type d'organisation le nom, pour simplifier (on récup une vue là)
+                         $allProprio = $db->query("SELECT * FROM nom_proprio");
+                         $a = $_SESSION['id'];
+                         $allAnimaux = $db->query("SELECT * FROM animal NATURAL JOIN nom_proprio WHERE osteo_id=$a");
+                         echo '<br>';
+                         if ($_SESSION['choixAnimalConsult'] != "-1") {
+                              $idAnimal = $_SESSION['choixAnimalConsult'];
+                              $infoAnimal = $db->query("SELECT * FROM `animal` NATURAL JOIN nom_proprio WHERE idAnimal=$idAnimal");
+
+                              echo '<table id="describeAnimal">
                               <tr>
                                    <th>Nom</th>
                                    <th>Espèce</th>
@@ -153,142 +157,143 @@ session_start(); // On démarre la session AVANT toute chose
                                    <th>Castration</th>
                                    <th>Propriétaire</th>
                               <tr>';
-                         while ($x = $infoAnimal->fetch()) {
-                              $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
-                              $c = ($x['castration'] == "o") ? 'oui' : 'non';
+                              while ($x = $infoAnimal->fetch()) {
+                                   $s = ($x['sexe'] == "f") ? 'Femelle' : 'Mâle';
+                                   $c = ($x['castration'] == "o") ? 'oui' : 'non';
 
-                              echo "
+                                   echo "
                               <tr>
                                    <td>" . $x['nomAnimal'] .
-                                   "</td>
+                                        "</td>
                                    <td>" . $x['espece'] .
-                                   "</td>
+                                        "</td>
                                    <td>" . $x['race'] .
-                                   "</td>
+                                        "</td>
                                    <td>" . $x['taille'] . ' cm' .
-                                   "</td>
+                                        "</td>
                                    <td>" . $x['poids'] . ' kg' .
-                                   "</td>
+                                        "</td>
                                    <td>" . $s .
-                                   "</td>
+                                        "</td>
                                    <td>" . $c .
-                                   "</td>
+                                        "</td>
                                    <td>" . $x['nom'] . ' ' . $x['prenom'] .
-                                   "</td>
+                                        "</td>
                               </tr></table>";
-                         }
-                    } ?>
-                    <br>
-                    <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
-                         <center>
-                              <br>
-                              Ajouter une consultation
-                              <br>
-                              <form method="post" action="?">
-                                   <br> Durée:
-                                   <select name="heure">
-                                        <option value="0" selected>0</option>
-                                        <?php
-                                        for ($i = 1; $i <= 24; $i++) {
-                                             echo '<option value="' . $i . '">' . $i . '</option>';
-                                        }
-                                        ?>
-                                   </select>
-                                   h
-                                   <select name="min">
-                                        <option value="0" selected>0</option>
-                                        <?php
-                                        for ($i = 1; $i <= 59; $i++) {
-                                             echo '<option value="' . $i . '">' . $i . '</option>';
-                                        }
-                                        ?>
-                                   </select>
-                                   min
-                                   <select name="sec">
-                                        <option value="0" selected>0</option>
-                                        <?php
-                                        for ($i = 1; $i <= 59; $i++) {
-                                             echo '<option value="' . $i . '">' . $i . '</option>';
-                                        }
-                                        ?>
-                                   </select>
-                                   sec
-                                   <br>
-                                   <p>Anamnese</p>
-                                   <textarea id="story" name="anamnese" rows="3" cols="80"></textarea>
-                                   <br>
-                                   <p>Diagnostique</p>
-                                   <textarea id="story" name="diagnostic" rows="3" cols="80"></textarea>
-                                   <br>
-                                   <p>Manipulations</p>
-                                   <textarea id="story" name="manip" rows="3" cols="80"></textarea>
-                                   <br>
-                                   <input type="text" name="suivi" placeholder="Suivi"><br>
-
-                                   Lieu de la consultation
-                                   <select name="lieuConsult" required>
-                                        <option value="">None</option>
-                                        <?php
-                                        $a = $_SESSION['id'];
-                                        $result = $db->query("SELECT * FROM lieu_consultation WHERE osteo_id=$a ORDER BY lieuConsultation");
-                                        while ($t = $result->fetch()) {
-                                             echo '<option value="' . $t['lieuConsultation'] . '">' . $t['lieuConsultation'] . '</option>';
-                                        }
-                                        ?>
-                                   </select>
-                                   Type de la consultation
-                                   <select name="typeConsult" required>
-                                        <option value="">None</option>
-                                        <?php
-                                        $a = $_SESSION['id'];
-                                        $result = $db->query("SELECT * FROM type_consultation WHERE osteo_id=$a ORDER BY typeConsultation");
-                                        while ($t = $result->fetch()) {
-                                             echo '<option value="' . $t['typeConsultation'] . '">' . $t['typeConsultation'] . '</option>';
-                                        }
-                                        ?>
-                                   </select>
-
-                                   <input type="submit" name="subConsult" value="Ajouter">
-                                   <input type="reset" value="Effacer" onAction=>
-                                   <br>
-                                   <br>
-                              </form>
-                              <?php
-                              if (isset($_POST['subConsult'])) {
-                                   $anam = (isset($_POST['anamnese'])) ? $_POST['anamnese'] : "-";
-                                   $diag = (isset($_POST['diagnostic'])) ? $_POST['diagnostic'] : "-";
-                                   $mani = (isset($_POST['manip'])) ? $_POST['manip'] : "-";
-                                   $suiv = (isset($_POST['suivi'])) ? $_POST['suivi'] : "-";
-                                   $dure = $_POST['heure'] . ':' . $_POST['min'] . ':' . $_POST['sec'];
-                                   $a = $_SESSION['id'];
-
-                                   $searchTarif = $db->prepare("SELECT idTarif FROM tarif WHERE osteo_id=:a AND lieuConsultation=:b AND typeConsultation=:c");
-                                   $searchTarif->execute(['a' => $a, 'b' => $_POST['lieuConsult'], 'c' => $_POST['typeConsult']]);
-
-                                   if ($searchTarif->rowCount() == 0) {
-                                        echo 'Ce tarif n\'existe pas avec ces paramètres';
-                                   } else {
-                                        $resu = $searchTarif->fetch();
-                                        $idTarif = $resu['idTarif'];
-                                        $db->beginTransaction();
-                                        $createAnimal = $db->prepare("INSERT INTO consultation VALUES(DEFAULT, DEFAULT, :b, :c, :d, :e, :f, :g, :h, :i)");
-                                        $createAnimal->execute([
-                                             'b' => $dure,
-                                             'c' => $anam, 'd' => $diag,
-                                             'e' => $mani, 'f' => $suiv,
-                                             'g' => $_SESSION['choixAnimalConsult'],
-                                             'h' => $idTarif,
-                                             'i' => $a
-                                        ]);
-                                        /* On valide les modifications */
-                                        $db->commit();
-                                   }
                               }
-                              ?>
-                    </div>
-                    <br>
+                         } ?>
+                         <br>
+                         <div style="position: relative; padding : 4px 0px 12px 0px; box-shadow: 3px 3px 3px 3px #aaaaaa;">
+                              <center>
+                                   <br>
+                                   Ajouter une consultation
+                                   <br>
+                                   <form method="post" action="?">
+                                        <br> Durée:
+                                        <select name="heure">
+                                             <option value="0" selected>0</option>
+                                             <?php
+                                             for ($i = 1; $i <= 24; $i++) {
+                                                  echo '<option value="' . $i . '">' . $i . '</option>';
+                                             }
+                                             ?>
+                                        </select>
+                                        h
+                                        <select name="min">
+                                             <option value="0" selected>0</option>
+                                             <?php
+                                             for ($i = 1; $i <= 59; $i++) {
+                                                  echo '<option value="' . $i . '">' . $i . '</option>';
+                                             }
+                                             ?>
+                                        </select>
+                                        min
+                                        <select name="sec">
+                                             <option value="0" selected>0</option>
+                                             <?php
+                                             for ($i = 1; $i <= 59; $i++) {
+                                                  echo '<option value="' . $i . '">' . $i . '</option>';
+                                             }
+                                             ?>
+                                        </select>
+                                        sec
+                                        <br>
+                                        <p>Anamnese</p>
+                                        <textarea id="story" name="anamnese" rows="3" cols="80"></textarea>
+                                        <br>
+                                        <p>Diagnostique</p>
+                                        <textarea id="story" name="diagnostic" rows="3" cols="80"></textarea>
+                                        <br>
+                                        <p>Manipulations</p>
+                                        <textarea id="story" name="manip" rows="3" cols="80"></textarea>
+                                        <br>
+                                        <input type="text" name="suivi" placeholder="Suivi"><br>
+
+                                        Lieu de la consultation
+                                        <select name="lieuConsult" required>
+                                             <option value="">None</option>
+                                             <?php
+                                             $a = $_SESSION['id'];
+                                             $result = $db->query("SELECT * FROM lieu_consultation WHERE osteo_id=$a ORDER BY lieuConsultation");
+                                             while ($t = $result->fetch()) {
+                                                  echo '<option value="' . $t['lieuConsultation'] . '">' . $t['lieuConsultation'] . '</option>';
+                                             }
+                                             ?>
+                                        </select>
+                                        Type de la consultation
+                                        <select name="typeConsult" required>
+                                             <option value="">None</option>
+                                             <?php
+                                             $a = $_SESSION['id'];
+                                             $result = $db->query("SELECT * FROM type_consultation WHERE osteo_id=$a ORDER BY typeConsultation");
+                                             while ($t = $result->fetch()) {
+                                                  echo '<option value="' . $t['typeConsultation'] . '">' . $t['typeConsultation'] . '</option>';
+                                             }
+                                             ?>
+                                        </select>
+
+                                        <input type="submit" name="subConsult" value="Ajouter">
+                                        <input type="reset" value="Effacer" onAction=>
+                                        <br>
+                                        <br>
+                                   </form>
+                                   <?php
+                                   if (isset($_POST['subConsult'])) {
+                                        $anam = (isset($_POST['anamnese'])) ? $_POST['anamnese'] : "-";
+                                        $diag = (isset($_POST['diagnostic'])) ? $_POST['diagnostic'] : "-";
+                                        $mani = (isset($_POST['manip'])) ? $_POST['manip'] : "-";
+                                        $suiv = (isset($_POST['suivi'])) ? $_POST['suivi'] : "-";
+                                        $dure = $_POST['heure'] . ':' . $_POST['min'] . ':' . $_POST['sec'];
+                                        $a = $_SESSION['id'];
+
+                                        $searchTarif = $db->prepare("SELECT idTarif FROM tarif WHERE osteo_id=:a AND lieuConsultation=:b AND typeConsultation=:c");
+                                        $searchTarif->execute(['a' => $a, 'b' => $_POST['lieuConsult'], 'c' => $_POST['typeConsult']]);
+
+                                        if ($searchTarif->rowCount() == 0) {
+                                             echo 'Ce tarif n\'existe pas avec ces paramètres';
+                                        } else {
+                                             $resu = $searchTarif->fetch();
+                                             $idTarif = $resu['idTarif'];
+                                             $db->beginTransaction();
+                                             $createAnimal = $db->prepare("INSERT INTO consultation VALUES(DEFAULT, DEFAULT, :b, :c, :d, :e, :f, :g, :h, :i)");
+                                             $createAnimal->execute([
+                                                  'b' => $dure,
+                                                  'c' => $anam, 'd' => $diag,
+                                                  'e' => $mani, 'f' => $suiv,
+                                                  'g' => $_SESSION['choixAnimalConsult'],
+                                                  'h' => $idTarif,
+                                                  'i' => $a
+                                             ]);
+                                             /* On valide les modifications */
+                                             $db->commit();
+                                        }
+                                   }
+                                   ?>
+                         </div>
+                         <br>
 
                     <?php
+                    }
                     $a = $_SESSION['id'];
                     $w = $db->query("SELECT * FROM consultation WHERE osteo_id=$a");
                     if ($w->rowCount() > 0) {
@@ -313,13 +318,22 @@ session_start(); // On démarre la session AVANT toute chose
                                         <th>Propriétaire</th>
                                         <th>Manipulations</th>
                                         <th>Prix</th>
+                                        <?php
+                                        if (isset($_SESSION['isAdmin'])) {
+                                             echo ' <th>Utilisateur</th>';
+                                        }
+
+                                        ?>
                                         <th>Action</th>
 
                                    </tr>
                               </thead>
                               <?php
-                              $a = $_SESSION['id'];
-                              $allConsultations = $db->query("SELECT * FROM `consultation` c 
+
+                              if (!isset($_SESSION['isAdmin'])) {
+
+                                   $a = $_SESSION['id'];
+                                   $allConsultations = $db->query("SELECT * FROM `consultation` c 
                                                        JOIN animal 
                                                        JOIN tarif 
                                                        JOIN nom_proprio 
@@ -327,14 +341,28 @@ session_start(); // On démarre la session AVANT toute chose
                                                             AND tarif.idTarif = c.idTarif 
                                                             AND animal.idProprietaire = nom_proprio.idProprietaire 
                                                             AND c.osteo_id=$a");
-
+                              } else {
+                                   $allConsultations = $db->query("SELECT * FROM `consultation` c 
+                                   JOIN animal 
+                                   JOIN tarif 
+                                   JOIN nom_proprio 
+                                   JOIN users u
+                                   WHERE animal.idAnimal = c.idAnimal 
+                                        AND tarif.idTarif = c.idTarif 
+                                        AND animal.idProprietaire = nom_proprio.idProprietaire 
+                                        AND c.osteo_id=u.osteo_id");
+                              }
                               while ($x = $allConsultations->fetch()) {
                                    echo "<tr><td>" . $x['date'] .
                                         "</td><td>" . $x['dureeConsultation'] .
                                         "</td><td>" . $x['nomAnimal'] .
                                         "</td><td>" . $x['nom'] . ' ' . $x['prenom'] .
                                         "</td><td>" . $x['resumManip'] .
-                                        "</td><td>" . $x['prix'] . ' €' .
+                                        "</td><td>" . $x['prix'] . ' €';
+                                   if (isset($_SESSION['isAdmin'])) {
+                                        echo '</td><td>' . $x['username'];
+                                   }
+                                   echo
                                         "</td><td>" . ' ' . '<form method="post" action="?">
                                                             <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
                                                             <input type="submit" name="delConsultation" value="supprimer" style="background-color:red!important;border:hidden;">
@@ -344,7 +372,7 @@ session_start(); // On démarre la session AVANT toute chose
                                                        <input type="hidden" name="idConsultation" value="' . $x['idConsultation'] . '" >
                                                        <input type="submit" name="detailConsultation" value="Voir en détail" style="background-color:#834fa8!important;border:hidden;">
                                                        </form> ' .
-                                        "</td></tr>";
+                                             "</td></tr>";
                               }
 
                               if (isset($_POST['delConsultation'])) {
