@@ -52,7 +52,11 @@
 
     $idOrga = $a;
     $a = $_SESSION['id'];
-    $allParticuliers = $db->query("SELECT idProprietaire, nomPa, prenomPa, emailPa FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=$a ORDER BY nomPa, prenomPa");
+    if (!$_SESSION['isAdmin'] == true) {
+        $allParticuliers = $db->query("SELECT idProprietaire, nomPa, prenomPa, emailPa FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=$a ORDER BY nomPa, prenomPa");
+    } else {
+        $allParticuliers = $db->query("SELECT idProprietaire, nomPa, prenomPa, emailPa FROM particulier NATURAL JOIN proprietaire ORDER BY nomPa, prenomPa");
+    }
     echo '<form method="post" action="?" >
     <select name="particulier" required>
     <option value="">Ajouter un contact</option>';
@@ -66,9 +70,17 @@
     </form><br>';
 
     if (isset($_POST['addContact'])) {
-        echo $_POST['particulier'] . ' ' . $_POST['orga'] . ' ' . $_POST['fonction'];
-        $prep = $db->prepare("INSERT INTO a_contacter VALUES(:b,:a,:c)");
-        $prep->execute(['b' => $_POST['particulier'], 'a' =>  $_POST['orga'], 'c' => $_POST['fonction']]);
+        $x = $_POST['orga'];
+        $w = $_POST['particulier'];
+        $verif = $db->query("SELECT * FROM a_contacter WHERE idProprietaire_ORGANISME=$x AND idProprietaire=$w");
+
+        if ($verif->rowCount() > 0) {
+            echo 'Ce contact a déjà été ajouté';
+        } else {
+            $prep = $db->prepare("INSERT INTO a_contacter VALUES(:b,:a,:c)");
+            $prep->execute(['b' => $_POST['particulier'], 'a' =>  $_POST['orga'], 'c' => $_POST['fonction']]);
+        }
+
     ?>
         <meta http-equiv="refresh" content="0">
     <?php
