@@ -203,8 +203,8 @@
             <div class="linktitle">
           </li>
           <li>
-            <div class="icons"><a href="./tarif.php"><i class="fa fa-file" aria-hidden="true"></i></a></div><a href="./articles.php">
-              <div class="linktitle">Articles</div></i>
+            <div class="icons"><a href="./tarif.php"><i class="fa fa-file" aria-hidden="true"></i></a></div><a href="./posts.php">
+              <div class="linktitle">Posts</div></i>
             </a>
             <div class="linktitle">
           </li>
