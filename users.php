@@ -84,7 +84,7 @@ session_start(); // On démarre la session AVANT toute chose
             include './includes/right-navbar.php';
             include './includes/database.php'; // Connexion à la bdd
             $a = $_SESSION['id'];
-            $allUsers = $db->query("SELECT * FROM users WHERE osteo_id!=$a");
+            $allUsers = $db->query("SELECT * FROM users WHERE osteo_id!=$a AND admin!=1");
             ?>
         </div>
         <br /><br />
@@ -93,7 +93,7 @@ session_start(); // On démarre la session AVANT toute chose
 
             <div class="container" style="background-color: white; max-width: 1060px; min-width: 100px!important;">
                 <?php
-                if (isset($_POST['idUser'])) {
+                if (isset($_POST['modifUser'])) {
                     $w = $_POST['idUser'];
                     $f = $db->query("SELECT * FROM users WHERE osteo_id=$w");
                     $z = $f->fetch();
@@ -129,7 +129,9 @@ session_start(); // On démarre la session AVANT toute chose
                                 <input hidden name="modifUser">
                                 <input hidden name="idUser" <?php echo 'value="' . $_POST['idUser'] . '"';  ?>>
                                 <input style=" width: 100px; margin: 10px auto;" type="submit" name="subModif" value=" Modifier" />
-                                <input style=" width: 100px; margin: 10px auto;" type="submit" value=" Annuler" />
+                            </form>
+                            <form action="?" method="post">
+                                <input style=" width: 100px; margin: 10px auto;" type="submit" value="Annuler" />
                             </form>
                             <br>
                             <form action="?" method="post">
@@ -230,18 +232,28 @@ session_start(); // On démarre la session AVANT toute chose
                                                             <input type="submit" name="modifUser" value="Modifier" style="background-color:#834fa8!important;border:hidden;">
                                                        </form>
 
-                                                       <form method="post" action="./consultation-detail.php" target="_blank">
+                                                       <form method="post" action="?">
                                                        <input type="hidden" name="idUser" value="' . $x['osteo_id'] . '" >
                                                             <input type="submit" name="delUser" value="supprimer" style="background-color:red!important;border:hidden;">
                                                       
                                                        </form> ' .
                                         "</td></tr>";
                             }
+                            if (isset($_POST['delUser'])) {
+                                $a = $_POST['idUser'];
+                                $db->query("DELETE traitement FROM traitement JOIN animal a ON (traitement.idAnimal= a.idAnimal) WHERE a.osteo_id=$a");
+                                $db->query("DELETE FROM consultation WHERE osteo_id=$a");
+                                $db->query("DELETE FROM medicament WHERE osteo_id=$a");
+                                $db->query("DELETE FROM lieu_consultation WHERE osteo_id=$a");
+                                $db->query("DELETE FROM type_consultation WHERE osteo_id=$a");
+                                $db->query("DELETE FROM tarif WHERE osteo_id=$a");
+                                $db->query("DELETE FROM animal WHERE osteo_id=$a");
+                                $db->query("DELETE a_contacter FROM a_contacter NATURAL JOIN proprietaire WHERE osteo_id=$a");
+                                $db->query("DELETE organisme FROM organisme NATURAL JOIN proprietaire WHERE osteo_id=$a");
+                                $db->query("DELETE particulier FROM particulier NATURAL JOIN proprietaire WHERE osteo_id=$a");
+                                $db->query("DELETE FROM proprietaire WHERE osteo_id=$a");
+                                $db->query("DELETE FROM users WHERE osteo_id=$a");
 
-                            if (isset($_POST['delConsultation'])) {
-                                $a = $_POST['idConsultation'];
-                                $b = $_SESSION['id'];
-                                $db->query("DELETE FROM consultation WHERE idConsultation = $a AND osteo_id=$b ");
                             ?>
                                 <meta http-equiv="refresh" content="0">
                             <?php
