@@ -109,7 +109,7 @@
 		if (isset($_POST['confirmToZero'])) {
 			if ($_POST['inputConfirm'] == "EFFACERMESDONNEES") {
 				$a = $_SESSION['id'];
-				$db->query("DELETE FROM possede_proprio WHERE osteo_id=$a");
+				$db->query("DELETE FROM proprietaire WHERE osteo_id=$a");
 				$db->query("DELETE traitement FROM traitement JOIN animal a ON (traitement.idAnimal= a.idAnimal) WHERE a.osteo_id=$a");
 				$db->query("DELETE FROM consultation WHERE osteo_id=$a");
 				$db->query("DELETE FROM medicament WHERE osteo_id=$a");
@@ -137,7 +137,7 @@
 		if (isset($_POST['confirmDelete'])) {
 			if ($_POST['inputConfirm'] == "SUPPRIMERMONCOMPTE") {
 				$a = $_SESSION['id'];
-				$db->query("DELETE FROM possede_proprio WHERE osteo_id=$a");
+				$db->query("DELETE FROM proprietaire WHERE osteo_id=$a");
 				$db->query("DELETE traitement FROM traitement JOIN animal a ON (traitement.idAnimal= a.idAnimal) WHERE a.osteo_id=$a");
 				$db->query("DELETE FROM consultation WHERE osteo_id=$a");
 				$db->query("DELETE FROM medicament WHERE osteo_id=$a");
